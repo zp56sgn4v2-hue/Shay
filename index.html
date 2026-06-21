@@ -3,185 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShayDex V9.1</title>
+<title>ShayDex V10</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
 font-family:Inter,system-ui,sans-serif;
-background:
-radial-gradient(circle at top left,#7c3aed 0%,transparent 35%),
-radial-gradient(circle at top right,#06b6d4 0%,transparent 25%),
-linear-gradient(180deg,#050816,#111827);
-color:white;min-height:100vh
+background:linear-gradient(180deg,#050816,#0f172a);
+color:white;min-height:100vh;overflow-x:hidden;
 }
+body::before,body::after{
+content:'';position:fixed;border-radius:50%;filter:blur(90px);z-index:-1;
+animation:float 20s ease-in-out infinite alternate;
+}
+body::before{width:400px;height:400px;background:#7c3aed44;left:-100px;top:-50px}
+body::after{width:350px;height:350px;background:#06b6d433;right:-100px;top:100px}
+@keyframes float{from{transform:translateY(0)}to{transform:translateY(80px)}}
+
 header{text-align:center;padding:50px 20px 20px}
-h1{
-font-size:5rem;font-weight:900;
-background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);
--webkit-background-clip:text;color:transparent
+h1{font-size:5rem;font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
+.subtitle{max-width:700px;margin:10px auto;color:#94a3b8}
+
+.ticker{overflow:hidden;white-space:nowrap;padding:10px 0;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.ticker span{display:inline-block;padding-left:100%;animation:scroll 25s linear infinite;color:#facc15;font-weight:700}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+.featured,.stats{
+max-width:1100px;margin:18px auto;padding:16px 20px;
+background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+border-radius:20px;text-align:center
 }
-.ticker{
-overflow:hidden;white-space:nowrap;
-background:rgba(250,204,21,.12);
-border-top:1px solid rgba(250,204,21,.3);
-border-bottom:1px solid rgba(250,204,21,.3);
-padding:12px 0
-}
-.ticker span{
-display:inline-block;padding-left:100%;
-animation:scroll 28s linear infinite;
-color:#facc15;font-weight:800
-}
-@keyframes scroll{
-from{transform:translateX(0)}
-to{transform:translateX(-100%)}
-}
-.description,.news{
-max-width:1100px;margin:20px auto;
-padding:20px;border-radius:24px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.12);
-text-align:center
-}
-.controls{
-display:flex;justify-content:center;gap:12px;
-flex-wrap:wrap;padding:20px
-}
+.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:20px}
 input,select{
-padding:14px 18px;border-radius:999px;
-border:1px solid rgba(255,255,255,.15);
-background:rgba(255,255,255,.08);
-color:white
+padding:14px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+background:rgba(255,255,255,.06);color:white
 }
-.grid{
-max-width:1700px;margin:auto;padding:25px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:24px
-}
+.grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
 .card{
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.12);
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
 border-radius:28px;overflow:hidden;
-backdrop-filter:blur(16px);
-transition:.3s
+transition:.3s;opacity:0;transform:translateY(20px);
+animation:appear .6s forwards;
 }
-.card:hover{
-transform:translateY(-10px) scale(1.03);
-box-shadow:0 25px 50px rgba(0,0,0,.45)
-}
+.card:nth-child(n){animation-delay:calc(var(--i) * .05s)}
+@keyframes appear{to{opacity:1;transform:translateY(0)}}
+.card:hover{transform:translateY(-8px) rotateX(2deg) scale(1.02);box-shadow:0 25px 50px rgba(0,0,0,.45)}
 .card img{width:100%;display:block;cursor:pointer}
+.secret-card{position:relative;overflow:hidden}
+.secret-card::after{
+content:'';position:absolute;inset:0;
+background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
+transform:translateX(-120%);
+animation:shine 4s infinite;
+pointer-events:none;
+}
+@keyframes shine{to{transform:translateX(120%)}}
 .info{padding:16px}
 .number{color:#94a3b8;font-size:.85rem}
 .name{font-size:1.15rem;font-weight:800}
 .type{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:700}
-.basic{background:#cbd5e1;color:black}
-.rare{background:#60a5fa;color:black}
-.secret{background:#facc15;color:black}
-.eternal{background:#10b981}
-.dark{background:#111827;border:1px solid #374151}
-.modal{
-display:none;position:fixed;inset:0;
-background:rgba(0,0,0,.96);
-justify-content:center;align-items:center;
-z-index:9999
-}
-.modal img{max-width:95vw;max-height:95vh;border-radius:20px}
+.basic{background:#cbd5e1;color:black}.rare{background:#60a5fa;color:black}
+.secret{background:#facc15;color:black}.eternal{background:#10b981}.dark{background:#111827;border:1px solid #374151}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);justify-content:center;align-items:center;z-index:9999;padding:20px}
+.modal-content{max-width:1000px;display:flex;gap:25px;flex-wrap:wrap;align-items:center}
+.modal img{max-width:400px;max-height:80vh;border-radius:20px}
+.details{max-width:400px}
+.details h2{margin-bottom:10px}
+.resultCount{text-align:center;color:#94a3b8}
 </style>
 </head>
 <body>
+<header>
+<h1>SHAYDEX</h1>
+<div class="subtitle">The official archive of the Shaylen Trading Card Collection.</div>
+</header>
 
-<header><h1>SHAYDEX</h1></header>
+<div class="ticker"><span>🔥 NEW CARD DROPS EVERY WEEK • SECRET RARES DISCOVERED • CHECK BACK FOR NEW SHAYLENS 🔥</span></div>
 
-<div class="ticker">
-<span>🔥 NEW CARD DROPS EVERY WEEK • CURRENT COLLECTION: 17 CARDS • SECRET RARES DISCOVERED • CHECK BACK FOR NEW SHAYLENS • 🔥</span>
-</div>
-
-<div class="description">
-<b>Welcome to ShayDex.</b> The official archive of the Shaylen Trading Card Collection. Browse every known Shaylen from common Basics to Secret Rares, Dark cards, and the legendary Christmas Shaylen. New cards are added regularly as the collection grows.
-</div>
-
-<div class="news">
-📢 Latest Drop: Hefty Shaylen (#017) • Next Drop: Coming Soon • Collection Size: 17 Cards
-</div>
+<div class="featured" id="featured"></div>
 
 <div class="controls">
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
 <select id="typeFilter" onchange="filterCards()">
-<option value="all">All Types</option>
-<option value="Basic">Basic</option>
-<option value="Rare">Rare</option>
-<option value="Secret Rare">Secret Rare</option>
-<option value="Eternal Legend">Eternal Legend</option>
-<option value="Dark">Dark</option>
+<option value="all">All Types</option><option>Basic</option><option>Rare</option><option>Secret Rare</option><option>Eternal Legend</option><option>Dark</option>
+</select>
+<select id="sort" onchange="renderCards()">
+<option value="number">Sort: Number</option>
+<option value="name">Sort: Name</option>
+<option value="rarity">Sort: Rarity</option>
 </select>
 </div>
 
+<div class="stats">17 Cards • 6 Basic • 5 Rare • 4 Secret Rare • 1 Eternal Legend • 1 Dark</div>
+<div class="resultCount" id="resultCount"></div>
 <div class="grid" id="grid"></div>
 
-<div class="modal" id="modal"><img id="modalImg"></div>
+<div class="modal" id="modal">
+<div class="modal-content">
+<img id="modalImg">
+<div class="details">
+<h2 id="modalName"></h2>
+<p id="modalMeta"></p><br>
+<p>Part of the legendary ShayDex collection.</p>
+</div>
+</div>
+</div>
 
 <script>
 const cards=[
-['1','Silly Shaylen','Basic','basic'],
-['2','Beaver Shaylen','Rare','rare'],
-['3','Sandy Shaylen','Rare','rare'],
-['4','Panda Shaylen','Rare','rare'],
-['5',"Cheesin' Shaylen",'Rare','rare'],
-['6','Princess Shaylen','Secret Rare','secret'],
-['7','Pickle Shaylen','Rare','rare'],
-['8','Dragon Shaylen','Secret Rare','secret'],
-['9','Bald Shaylen','Basic','basic'],
-['10','Shuggie','Secret Rare','secret'],
-['11','Baby Shaylen','Basic','basic'],
-['12','Christmas Shaylen','Eternal Legend','eternal'],
-['13','Devious Shaylen','Secret Rare','secret'],
-['14','Shocker Shaylen','Basic','basic'],
-['15','Evil Shaylen','Dark','dark'],
-['16','Innocent Shaylen','Basic','basic'],
-['17','Hefty Shaylen','Basic','basic']
+['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],['4','Panda Shaylen','Rare'],
+['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],['7','Pickle Shaylen','Rare'],
+['8','Dragon Shaylen','Secret Rare'],['9','Bald Shaylen','Basic'],['10','Shuggie','Secret Rare'],
+['11','Baby Shaylen','Basic'],['12','Christmas Shaylen','Eternal Legend'],['13','Devious Shaylen','Secret Rare'],
+['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
 ];
 
+const featured=cards[Math.floor(Math.random()*cards.length)];
+document.getElementById('featured').innerHTML='⭐ Featured Shaylen: <b>'+featured[1]+'</b>';
+
+function rarityRank(t){return {'Secret Rare':1,'Eternal Legend':2,'Dark':3,'Rare':4,'Basic':5}[t]||99}
+
+function renderCards(){
 const grid=document.getElementById('grid');
-cards.forEach(c=>{
-grid.innerHTML += `<div class="card" data-type="${c[2]}">
-<img data-base="card_${c[0]}">
-<div class="info">
-<div class="number">#${String(c[0]).padStart(3,'0')}</div>
-<div class="name">${c[1]}</div>
-<div class="type ${c[3]}">${c[2]}</div>
-</div></div>`;
+let arr=[...cards];
+const sort=document.getElementById('sort').value;
+if(sort==='name')arr.sort((a,b)=>a[1].localeCompare(b[1]));
+if(sort==='rarity')arr.sort((a,b)=>rarityRank(a[2])-rarityRank(b[2]));
+grid.innerHTML='';
+arr.forEach((c,i)=>{
+const cls=c[2]==='Secret Rare'?'secret-card':'';
+grid.innerHTML+=`<div class="card ${cls}" style="--i:${i}" data-type="${c[2]}">
+<img data-base="card_${c[0]}" data-name="${c[1]}" data-typex="${c[2]}" data-num="${c[0]}">
+<div class="info"><div class="number">#${String(c[0]).padStart(3,'0')}</div><div class="name">${c[1]}</div><div class="type">${c[2]}</div></div></div>`;
 });
+document.querySelectorAll('img[data-base]').forEach(loadSmart);
+filterCards();
+}
 
 function loadSmart(img){
-const base=img.dataset.base;
-const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP',base];
-let i=0;
-function next(){
- if(i>=tries.length) return;
- img.onerror=()=>{i++;next();};
- img.src=tries[i];
+const b=img.dataset.base;
+const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP',b];
+let i=0;(function next(){if(i>=tries.length)return;img.onerror=()=>{i++;next()};img.src=tries[i]})();
 }
-next();
-}
-document.querySelectorAll('img[data-base]').forEach(loadSmart);
 
 function filterCards(){
 const q=document.getElementById('search').value.toLowerCase();
 const t=document.getElementById('typeFilter').value;
+let shown=0;
 document.querySelectorAll('.card').forEach(card=>{
-const a=card.innerText.toLowerCase().includes(q);
-const b=(t==='all'||card.dataset.type===t);
-card.style.display=(a&&b)?'':'none';
+const ok=card.innerText.toLowerCase().includes(q)&&(t==='all'||card.dataset.type===t);
+card.style.display=ok?'':'none';
+if(ok) shown++;
 });
+document.getElementById('resultCount').innerText=`Showing ${shown} of 17 cards`;
 }
 
+renderCards();
+
 const modal=document.getElementById('modal');
-const modalImg=document.getElementById('modalImg');
 document.addEventListener('click',e=>{
 if(e.target.matches('.card img')){
+document.getElementById('modalImg').src=e.target.src;
+document.getElementById('modalName').innerText=e.target.dataset.name;
+document.getElementById('modalMeta').innerText='#'+String(e.target.dataset.num).padStart(3,'0')+' • '+e.target.dataset.typex;
 modal.style.display='flex';
-modalImg.src=e.target.src;
 }
 });
 modal.onclick=()=>modal.style.display='none';
