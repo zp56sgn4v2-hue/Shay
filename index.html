@@ -6,16 +6,10 @@
 <title>ShayDex V5.1</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{
-background:linear-gradient(180deg,#050816,#0f172a);
-}
 body{
 font-family:Inter,system-ui,sans-serif;
 background:linear-gradient(180deg,#050816,#0f172a);
-color:white;
-min-height:100vh;
-overflow-x:hidden;
-margin:0;
+color:white;min-height:100vh;overflow-x:hidden;
 }
 body:before,body:after{
 content:"";position:fixed;border-radius:50%;filter:blur(140px);z-index:-1;
@@ -48,7 +42,7 @@ gap:24px;
 padding:24px;
 align-items:center;
 }
-.featured img{width:100%;border-radius:22px}
+.featured img{width:100%;border-radius:22px;animation:floatCard 4s ease-in-out infinite}.featured{animation:fadeIn .8s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}@keyframes floatCard{50%{transform:translateY(-6px)}}
 
 .controls{
 display:flex;gap:12px;flex-wrap:wrap;padding:18px;
@@ -69,25 +63,8 @@ gap:12px;padding:18px;
 
 .grid{width:min(95%,1500px);margin:20px auto;gap:18px;display:grid}
 .grid.grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-
-/* Showcase = one premium card per row */
-.grid.showcase{
-grid-template-columns:1fr;
-max-width:700px;
-margin:20px auto;
-}
-.grid.showcase .card{border-radius:30px}
-.grid.showcase .info{padding:20px}
-.grid.showcase .info strong{font-size:1.4rem}
-
-/* Binder = collector layout */
-.grid.binder{
-grid-template-columns:repeat(3,1fr);
-max-width:1000px;
-margin:20px auto;
-gap:12px;
-}
-.grid.binder .card{border-radius:14px}
+.grid.showcase{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.grid.binder{grid-template-columns:repeat(3,1fr)}
 
 .card{
 background:rgba(255,255,255,.05);
@@ -98,7 +75,7 @@ transform-style:preserve-3d;
 transition:transform .08s linear;
 position:relative;
 }
-.card img{width:100%;display:block}
+.card img{width:100%;display:block;opacity:0;transition:opacity .35s ease}
 .card:hover{box-shadow:0 25px 60px rgba(0,0,0,.5)}
 
 .card::after{
@@ -136,7 +113,6 @@ z-index:9999;padding:20px;
 .featured{grid-template-columns:1fr}
 .stats{grid-template-columns:repeat(2,1fr)}
 .grid.binder{grid-template-columns:repeat(2,1fr)}
-.grid.showcase{max-width:95%}
 .controls>*{width:100%}
 }
 </style>
@@ -153,7 +129,7 @@ z-index:9999;padding:20px;
 <div>
 <h3 style="color:#facc15">FEATURED SHAYLEN</h3>
 <h2 id="featuredName"></h2>
-<p id="featuredType" style="color:#94a3b8"></p>
+<p id="featuredType" style="color:#94a3b8"></p><br><button id="jumpFeatured" style="padding:12px 18px;border:none;border-radius:14px;background:#facc15;color:#111;font-weight:700;cursor:pointer">Jump To Featured Card</button>
 </div>
 </div>
 
@@ -161,6 +137,7 @@ z-index:9999;padding:20px;
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
 <select id="viewMode" onchange="changeView()">
 <option value="grid">Grid View</option>
+<option value="showcase">Showcase View</option>
 <option value="binder">Binder View</option>
 </select>
 </div>
@@ -172,7 +149,7 @@ z-index:9999;padding:20px;
 <div class="stat"><b>4</b>Secret</div>
 <div class="stat"><b>1</b>Legend</div>
 </div>
-
+<div id="emptyState" style="display:none;text-align:center;color:#94a3b8;padding:20px">🔍 No Shaylens found.<br>Try another search term.</div>
 <div id="grid" class="grid"></div>
 
 <div class="modal" id="modal"><img id="modalImg"></div>
@@ -209,17 +186,37 @@ return `<div class="card ${cls}" data-search="${c.join(' ').toLowerCase()}">
 </div>`;
 }).join('');
 
-document.querySelectorAll('[data-base]').forEach(i=>loadSmart(i,i.dataset.base));
+
+document.querySelectorAll('[data-base]').forEach(i=>{
+loadSmart(i,i.dataset.base);
+i.onload=()=>i.style.opacity='1';
+});
+
+function updateEmpty(){
+let visible=[...document.querySelectorAll('.card')].filter(c=>c.style.display!=='none').length;
+const es=document.getElementById('emptyState');
+if(es) es.style.display=visible? 'none':'block';
+}
+
+const jumpBtn=document.getElementById('jumpFeatured');
+if(jumpBtn){
+jumpBtn.onclick=()=>{
+const target=[...document.querySelectorAll('.card')].find(c=>c.dataset.search.includes(featured[1].toLowerCase()));
+if(target) target.scrollIntoView({behavior:'smooth',block:'center'});
+};
+}
+
 
 function filterCards(){
 const q=search.value.toLowerCase();
 document.querySelectorAll('.card').forEach(c=>{
 c.style.display=c.dataset.search.includes(q)?'':'none';
 });
+updateEmpty();
 }
 
 function changeView(){
-grid.className='grid '+(viewMode.value || 'grid');
+grid.className='grid '+viewMode.value;
 }
 changeView();
 
