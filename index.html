@@ -3,52 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ShayDex V5.2</title>
+<title>ShayDex V5.1</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#050816,#0f172a);color:white;min-height:100vh;overflow-x:hidden}
-body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(140px);z-index:-1}
+body{
+font-family:Inter,system-ui,sans-serif;
+background:linear-gradient(180deg,#050816,#0f172a);
+color:white;min-height:100vh;overflow-x:hidden;
+}
+body:before,body:after{
+content:"";position:fixed;border-radius:50%;filter:blur(140px);z-index:-1;
+}
 body:before{width:500px;height:500px;background:#7c3aed33;left:-150px;top:-100px}
 body:after{width:450px;height:450px;background:#06b6d433;right:-150px;top:0}
 
 .hero{text-align:center;padding:50px 20px 20px}
-.hero h1{font-size:clamp(3rem,12vw,7rem);font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
+.hero h1{
+font-size:clamp(3rem,12vw,7rem);
+font-weight:900;
+background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);
+-webkit-background-clip:text;color:transparent;
+}
 .hero p{color:#94a3b8}
 
-.glass{width:min(94%,1200px);margin:18px auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);border-radius:28px}
+.glass{
+width:min(94%,1200px);
+margin:18px auto;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+backdrop-filter:blur(20px);
+border-radius:28px;
+}
 
-.featured{display:grid;grid-template-columns:320px 1fr;gap:24px;padding:24px;align-items:center}
+.featured{
+display:grid;
+grid-template-columns:320px 1fr;
+gap:24px;
+padding:24px;
+align-items:center;
+}
 .featured img{width:100%;border-radius:22px}
 
-.controls{display:flex;gap:12px;flex-wrap:wrap;padding:18px}
-input,select{padding:14px;border:none;border-radius:16px;background:rgba(255,255,255,.08);color:white}
+.controls{
+display:flex;gap:12px;flex-wrap:wrap;padding:18px;
+}
+input,select{
+padding:14px;border:none;border-radius:16px;
+background:rgba(255,255,255,.08);color:white;
+}
 input{flex:1}
 
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:18px}
+.stats{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:12px;padding:18px;
+}
 .stat{text-align:center;background:rgba(255,255,255,.04);padding:16px;border-radius:18px}
 .stat b{display:block;font-size:1.8rem}
 
 .grid{width:min(95%,1500px);margin:20px auto;gap:18px;display:grid}
 .grid.grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.grid.showcase{grid-template-columns:1fr;max-width:650px}
-.grid.showcase .card .info strong{font-size:1.4rem}
-.grid.binder{grid-template-columns:repeat(3,1fr);max-width:1000px}
+
+/* Showcase = one premium card per row */
+.grid.showcase{
+grid-template-columns:1fr;
+max-width:700px;
+margin:20px auto;
+}
+.grid.showcase .card{border-radius:30px}
+.grid.showcase .info{padding:20px}
+.grid.showcase .info strong{font-size:1.4rem}
+
+/* Binder = collector layout */
+.grid.binder{
+grid-template-columns:repeat(3,1fr);
+max-width:1000px;
+margin:20px auto;
+gap:12px;
+}
 .grid.binder .card{border-radius:14px}
 
-.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:22px;overflow:hidden;transform-style:preserve-3d;transition:transform .08s linear;position:relative}
+.card{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:22px;
+overflow:hidden;
+transform-style:preserve-3d;
+transition:transform .08s linear;
+position:relative;
+}
 .card img{width:100%;display:block}
 .card:hover{box-shadow:0 25px 60px rgba(0,0,0,.5)}
-.card::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-120%);transition:.9s;pointer-events:none}
+
+.card::after{
+content:"";
+position:absolute;inset:0;
+background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);
+transform:translateX(-120%);
+transition:.9s;
+pointer-events:none;
+}
 .card:hover::after{transform:translateX(120%)}
 
 .secret{box-shadow:0 0 25px rgba(250,204,21,.25)}
 .eternal{box-shadow:0 0 35px rgba(255,215,0,.35)}
 .dark{box-shadow:0 0 20px rgba(0,0,0,.9)}
 
-.info{padding:14px}.type{color:#94a3b8}
-.footer{text-align:center;padding:40px 20px;color:#94a3b8}
+.info{padding:14px}
+.type{color:#94a3b8}
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:9999;padding:20px}
+.footer{
+text-align:center;
+padding:40px 20px;
+color:#94a3b8;
+}
+
+.modal{
+display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.85);
+justify-content:center;align-items:center;
+z-index:9999;padding:20px;
+}
 .modal img{max-width:500px;max-height:85vh;border-radius:22px}
 
 @media(max-width:768px){
@@ -61,14 +136,21 @@ input{flex:1}
 </style>
 </head>
 <body>
+
 <div class="hero">
 <h1>SHAYDEX</h1>
 <p>The Official Shaylen Trading Card Archive</p>
 </div>
+
 <div class="glass featured">
 <img id="featuredImg">
-<div><h3 style="color:#facc15">FEATURED SHAYLEN</h3><h2 id="featuredName"></h2><p id="featuredType" style="color:#94a3b8"></p></div>
+<div>
+<h3 style="color:#facc15">FEATURED SHAYLEN</h3>
+<h2 id="featuredName"></h2>
+<p id="featuredType" style="color:#94a3b8"></p>
 </div>
+</div>
+
 <div class="glass controls">
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
 <select id="viewMode" onchange="changeView()">
@@ -77,11 +159,85 @@ input{flex:1}
 <option value="binder">Binder View</option>
 </select>
 </div>
+
 <div class="glass stats">
-<div class="stat"><b>17</b>Cards</div><div class="stat"><b>6</b>Basic</div><div class="stat"><b>5</b>Rare</div><div class="stat"><b>4</b>Secret</div><div class="stat"><b>1</b>Legend</div>
+<div class="stat"><b>17</b>Cards</div>
+<div class="stat"><b>6</b>Basic</div>
+<div class="stat"><b>5</b>Rare</div>
+<div class="stat"><b>4</b>Secret</div>
+<div class="stat"><b>1</b>Legend</div>
 </div>
+
 <div id="grid" class="grid"></div>
+
 <div class="modal" id="modal"><img id="modalImg"></div>
+
 <div class="footer">ShayDex • Collect • Discover • Archive</div>
+
+<script>
+const cards=[
+['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],
+['4','Panda Shaylen','Rare'],['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],
+['7','Pickle Shaylen','Rare'],['8','Dragon Shaylen','Secret Rare'],['9','Bald Shaylen','Basic'],
+['10','Shuggie','Secret Rare'],['11','Baby Shaylen','Basic'],['12','Christmas Shaylen','Eternal Legend'],
+['13','Devious Shaylen','Secret Rare'],['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],
+['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
+];
+
+function loadSmart(img,b){
+const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
+let i=0;(function n(){if(i>=tries.length)return;img.onerror=()=>{i++;n()};img.src=tries[i]})();}
+
+const featured=cards[Math.floor(Math.random()*cards.length)];
+featuredName.innerText=featured[1];
+featuredType.innerText=featured[2];
+loadSmart(featuredImg,'card_'+featured[0]);
+
+grid.innerHTML=cards.map(c=>{
+let cls='';
+if(c[2]=='Secret Rare')cls='secret';
+if(c[2]=='Eternal Legend')cls='eternal';
+if(c[2]=='Dark')cls='dark';
+return `<div class="card ${cls}" data-search="${c.join(' ').toLowerCase()}">
+<img data-base="card_${c[0]}">
+<div class="info"><strong>${c[1]}</strong><div class="type">${c[2]}</div></div>
+</div>`;
+}).join('');
+
+document.querySelectorAll('[data-base]').forEach(i=>loadSmart(i,i.dataset.base));
+
+function filterCards(){
+const q=search.value.toLowerCase();
+document.querySelectorAll('.card').forEach(c=>{
+c.style.display=c.dataset.search.includes(q)?'':'none';
+});
+}
+
+function changeView(){
+grid.className='grid '+viewMode.value;
+}
+changeView();
+
+document.querySelectorAll('.card').forEach(card=>{
+card.addEventListener('mousemove',e=>{
+const r=card.getBoundingClientRect();
+const x=(e.clientX-r.left-r.width/2)/(r.width/2);
+const y=(e.clientY-r.top-r.height/2)/(r.height/2);
+card.style.transform=`perspective(1000px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.03)`;
+});
+card.addEventListener('mouseleave',()=>{
+card.style.transform='perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
+});
+});
+
+document.addEventListener('click',e=>{
+if(e.target.matches('.card img')){
+modal.style.display='flex';
+modalImg.src=e.target.src;
+}
+});
+modal.onclick=()=>modal.style.display='none';
+</script>
+
 </body>
 </html>
