@@ -3,224 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ShayDex V5.1</title>
+<title>ShayDex — The Official Shaylen Trading Card Archive</title>
+<meta name="description" content="The official Shaylen trading card archive. Collect, discover, and favorite every Shaylen card.">
+
+<!-- Link preview / "share card" tags — this is what shows up when the site link
+     is shared in Messages, iMessage, Slack, etc. Swap the og:image / twitter:image
+     URL below for an absolute https:// link once this is hosted somewhere, since
+     most messaging apps won't reliably fetch a relative path. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="ShayDex — The Official Shaylen Trading Card Archive">
+<meta property="og:description" content="The official Shaylen trading card archive. Collect, discover, and favorite every Shaylen card.">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ShayDex — The Official Shaylen Trading Card Archive">
+<meta name="twitter:description" content="The official Shaylen trading card archive. Collect, discover, and favorite every Shaylen card.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="theme-color" content="#050309">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+/* ====================== TOKENS ====================== */
+:root{
+  --void:#050309;
+  --deep:#0b0a1c;
+  --violet:#7c3aed;
+  --cyan:#06b6d4;
+  --gold:#facc15;
+  --pink:#f472b6;
+  --blue:#60a5fa;
+  --ink:#f8fafc;
+  --ink-dim:#9aa3bb;
+  --ink-faint:#5e6680;
+  --glass:rgba(255,255,255,.045);
+  --glass-hi:rgba(255,255,255,.09);
+  --glass-border:rgba(255,255,255,.09);
+  --r-lg:26px;
+  --r-md:18px;
+  --r-sm:12px;
+  --font-display:'Space Grotesk',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+
+  --rarity-basic:#9aa3bb;
+  --rarity-rare:#60a5fa;
+  --rarity-secret:#b388ff;
+  --rarity-legend:#facc15;
+  --rarity-dark:#f87171;
+}
+
 *{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+
 body{
-font-family:Inter,system-ui,sans-serif;
-background:linear-gradient(180deg,#050816,#0f172a);
-color:white;min-height:100vh;overflow-x:hidden;
+  font-family:var(--font-body);
+  background:var(--void);
+  color:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
 }
-body:before,body:after{
-content:"";position:fixed;border-radius:50%;filter:blur(140px);z-index:-1;
-}
-body:before{width:500px;height:500px;background:#7c3aed33;left:-150px;top:-100px}
-body:after{width:450px;height:450px;background:#06b6d433;right:-150px;top:0}
 
-.hero{text-align:center;padding:50px 20px 20px}
+/* ambient nebula glow, fixed behind everything */
+.nebula{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.nebula i{position:absolute;border-radius:50%;filter:blur(120px);opacity:.35}
+.nebula i:nth-child(1){width:520px;height:520px;background:var(--violet);left:-180px;top:-160px}
+.nebula i:nth-child(2){width:460px;height:460px;background:var(--cyan);right:-160px;top:60px}
+.nebula i:nth-child(3){width:420px;height:420px;background:var(--pink);left:30%;bottom:-220px;opacity:.18}
+
+a{color:inherit}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* ====================== HERO ====================== */
+.hero{text-align:center;padding:64px 20px 24px}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:.75rem;letter-spacing:.18em;
+  color:var(--ink-dim);text-transform:uppercase;
+}
 .hero h1{
-font-size:clamp(3rem,12vw,7rem);
-font-weight:900;
-background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);
--webkit-background-clip:text;color:transparent;
+  font-family:var(--font-display);
+  font-size:clamp(3rem,13vw,6.5rem);
+  font-weight:700;
+  letter-spacing:-.02em;
+  background:linear-gradient(90deg,var(--gold),var(--pink),var(--blue));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin:6px 0 8px;
 }
-.hero p{color:#94a3b8}
+.hero p{color:var(--ink-dim);font-size:1.05rem}
 
+/* ====================== GLASS SHELL ====================== */
 .glass{
-width:min(94%,1200px);
-margin:18px auto;
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.08);
-backdrop-filter:blur(20px);
-border-radius:28px;
+  width:min(94%,1200px);
+  margin:18px auto;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-radius:var(--r-lg);
 }
 
+/* ====================== FEATURED ====================== */
 .featured{
-display:grid;
-grid-template-columns:320px 1fr;
-gap:24px;
-padding:24px;
-align-items:center;
+  display:grid;
+  grid-template-columns:240px 1fr;
+  gap:28px;
+  padding:28px;
+  align-items:center;
+  animation:fadeIn .7s ease both;
 }
-.featured img{width:100%;border-radius:22px;animation:floatCard 4s ease-in-out infinite}.featured{animation:fadeIn .8s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}@keyframes floatCard{50%{transform:translateY(-6px)}}
+.featured-frame{
+  position:relative;
+  aspect-ratio:5/7;
+  border-radius:20px;
+  overflow:hidden;
+  animation:floatCard 4.5s ease-in-out infinite;
+}
+.featured-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.featured-glow{position:absolute;inset:-2px;border-radius:22px;z-index:-1;filter:blur(18px);opacity:.6}
+.eyebrow-gold{color:var(--gold);font-family:var(--font-mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+.featured h2{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.4rem);margin:6px 0 2px}
+.featured .ftype{color:var(--ink-dim);font-family:var(--font-mono);font-size:.85rem;margin-bottom:18px}
+.featured-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  padding:13px 20px;border:none;border-radius:14px;
+  font-weight:600;font-size:.92rem;cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--gold);color:#181108}
+.btn-primary:hover{box-shadow:0 10px 24px rgba(250,204,21,.3)}
+.btn-ghost{background:var(--glass-hi);color:var(--ink);border:1px solid var(--glass-border)}
 
-.controls{
-display:flex;gap:12px;flex-wrap:wrap;padding:18px;
-}
-input,select{
-padding:14px;border:none;border-radius:16px;
-background:rgba(255,255,255,.08);color:white;
-}
-input{flex:1}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes floatCard{50%{transform:translateY(-8px)}}
 
-.stats{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:12px;padding:18px;
+/* ====================== TABS / NAV ====================== */
+.tabbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px}
+.tab{
+  padding:11px 18px;border:none;border-radius:14px;cursor:pointer;
+  background:var(--glass-hi);color:var(--ink-dim);font-weight:600;font-size:.9rem;
+  transition:background .15s ease,color .15s ease;
 }
-.stat{text-align:center;background:rgba(255,255,255,.04);padding:16px;border-radius:18px}
-.stat b{display:block;font-size:1.8rem}
+.tab[aria-pressed="true"]{background:var(--gold);color:#181108}
+.tab-spacer{flex:1}
+.fav-counter{
+  font-family:var(--font-mono);font-size:.85rem;color:var(--gold);
+  display:flex;align-items:center;gap:6px;
+}
 
-.grid{width:min(95%,1500px);margin:20px auto;gap:18px;display:grid}
-.grid.grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.grid.showcase{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+/* ====================== PROGRESS ====================== */
+.progressWrap{padding:18px 22px}
+.progress-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:.9rem;color:var(--ink-dim)}
+.progress-row b{color:var(--ink);font-family:var(--font-mono)}
+.progressBar{height:10px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.progressFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--pink));transition:width .5s cubic-bezier(.22,1,.36,1)}
+
+/* ====================== CONTROLS ====================== */
+.controls{display:flex;gap:12px;flex-wrap:wrap;padding:18px}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);opacity:.45;pointer-events:none}
+#search{
+  width:100%;padding:14px 14px 14px 44px;border:none;border-radius:14px;
+  background:var(--glass-hi);color:var(--ink);font-size:.95rem;
+}
+#search::placeholder{color:var(--ink-faint)}
+#viewMode{
+  padding:14px 16px;border:none;border-radius:14px;
+  background:var(--glass-hi);color:var(--ink);font-size:.9rem;cursor:pointer;
+}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 18px}
+.chip{
+  padding:8px 14px;border-radius:999px;border:1px solid var(--glass-border);
+  background:transparent;color:var(--ink-dim);font-size:.8rem;cursor:pointer;
+  font-family:var(--font-mono);transition:.15s ease;
+}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--void);border-color:var(--ink)}
+
+/* ====================== STATS ====================== */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:18px}
+.stat{text-align:center;background:var(--glass-hi);padding:16px 8px;border-radius:16px}
+.stat b{display:block;font-family:var(--font-mono);font-size:1.6rem;font-weight:600}
+.stat span{font-size:.72rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em}
+
+/* ====================== CTA ====================== */
+.cta{padding:30px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+.cta h2{font-family:var(--font-display);font-size:1.4rem;margin-bottom:4px}
+.cta p{color:var(--ink-dim);font-size:.92rem;max-width:46ch}
+
+/* ====================== GRID ====================== */
+.empty-state{width:min(95%,1500px);margin:30px auto;text-align:center;color:var(--ink-dim);padding:40px 20px}
+.empty-state .glyph{font-size:2.4rem;margin-bottom:10px}
+.empty-state[hidden]{display:none}
+
+.grid{width:min(95%,1500px);margin:20px auto;gap:20px;display:grid}
+.grid.grid-mode{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.grid.showcase{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 .grid.binder{grid-template-columns:repeat(3,1fr)}
+@media(max-width:768px){.grid.binder{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.grid.binder{grid-template-columns:1fr}}
 
 .card{
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.08);
-border-radius:22px;
-overflow:hidden;
-transform-style:preserve-3d;
-transition:transform .08s linear;
-position:relative;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .08s linear,box-shadow .25s ease,opacity .4s ease,border-color .25s ease;
+  opacity:0;transform:translateY(10px);
 }
-.card img{width:100%;display:block;opacity:0;transition:opacity .35s ease}
-.card:hover{box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.card.in{opacity:1;transform:none}
+.card-media{position:relative;aspect-ratio:5/7;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));overflow:hidden}
+.card-media img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s ease}
+.card-media img.loaded{opacity:1}
+.card:hover{box-shadow:0 22px 50px rgba(0,0,0,.55)}
 
-.card::after{
-content:"";
-position:absolute;inset:0;
-background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);
-transform:translateX(-120%);
-transition:.9s;
-pointer-events:none;
+/* holofoil sweep, intensity scales with rarity */
+.card-media::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%);
+  transform:translateX(-130%);
+  transition:transform .9s ease;
+  pointer-events:none;
 }
-.card:hover::after{transform:translateX(120%)}
-
-.secret{box-shadow:0 0 25px rgba(250,204,21,.25)}
-.eternal{box-shadow:0 0 35px rgba(255,215,0,.35)}
-.dark{box-shadow:0 0 20px rgba(0,0,0,.9)}
-
-.info{padding:14px}
-.type{color:#94a3b8}
-
-.footer{
-text-align:center;
-padding:40px 20px;
-color:#94a3b8;
+.card:hover .card-media::after{transform:translateX(130%)}
+.card[data-rarity="Secret Rare"] .card-media::after,
+.card[data-rarity="Eternal Legend"] .card-media::after{
+  background:linear-gradient(115deg,transparent 25%,rgba(250,204,21,.28) 42%,rgba(244,114,182,.28) 50%,rgba(96,165,250,.28) 58%,transparent 75%);
+}
+.card[data-rarity="Dark"] .card-media::after{
+  background:radial-gradient(circle at 50% 50%,rgba(248,113,113,.25),transparent 70%);
 }
 
+.card[data-rarity="Rare"]{box-shadow:0 0 0 1px rgba(96,165,250,.18)}
+.card[data-rarity="Secret Rare"]{box-shadow:0 0 24px rgba(179,136,255,.28)}
+.card[data-rarity="Eternal Legend"]{box-shadow:0 0 36px rgba(250,204,21,.4)}
+.card[data-rarity="Dark"]{box-shadow:0 0 22px rgba(248,113,113,.22)}
+
+.card-info{padding:14px}
+.card-info strong{font-family:var(--font-display);font-size:1.02rem;display:block}
+.rarity-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:8px;padding:4px 10px;border-radius:999px;
+  font-size:.7rem;font-family:var(--font-mono);letter-spacing:.04em;
+  background:rgba(255,255,255,.06);
+}
+.rarity-dot{width:7px;height:7px;border-radius:50%}
+
+.fav-btn{
+  position:absolute;top:10px;right:10px;z-index:5;
+  width:38px;height:38px;border:none;border-radius:50%;
+  background:rgba(5,3,9,.55);backdrop-filter:blur(6px);
+  color:var(--ink-faint);cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  transition:color .15s ease,transform .15s ease;
+}
+.fav-btn:hover{transform:scale(1.08)}
+.fav-btn[aria-pressed="true"]{color:var(--gold)}
+.card.favorited{border-color:rgba(250,204,21,.55)}
+.card.favorited{box-shadow:0 0 0 1px rgba(250,204,21,.4),0 18px 40px rgba(0,0,0,.5)}
+
+.skeleton{position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,.03) 30%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 70%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+.skeleton.hide{display:none}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* ====================== MODAL ====================== */
 .modal{
-display:none;position:fixed;inset:0;
-background:rgba(0,0,0,.85);
-justify-content:center;align-items:center;
-z-index:9999;padding:20px;
+  display:none;position:fixed;inset:0;
+  background:rgba(3,2,8,.88);backdrop-filter:blur(6px);
+  justify-content:center;align-items:center;
+  z-index:9999;padding:20px;
 }
-.modal img{max-width:500px;max-height:85vh;border-radius:22px}
+.modal.open{display:flex}
+.modal-inner{position:relative;max-width:520px;width:100%;text-align:center}
+.modal img{max-width:100%;max-height:78vh;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.modal-caption{margin-top:14px;font-family:var(--font-display);font-size:1.1rem}
+.modal-nav{position:fixed;top:50%;transform:translateY(-50%);background:var(--glass-hi);border:1px solid var(--glass-border);color:var(--ink);width:46px;height:46px;border-radius:50%;cursor:pointer;font-size:1.1rem}
+.modal-nav.prev{left:18px}
+.modal-nav.next{right:18px}
+.modal-close{position:fixed;top:18px;right:18px;background:var(--glass-hi);border:1px solid var(--glass-border);color:var(--ink);width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.1rem}
+@media(max-width:600px){.modal-nav{display:none}}
+
+/* ====================== TOAST ====================== */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--void);padding:12px 20px;border-radius:999px;
+  font-size:.85rem;font-weight:600;opacity:0;pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;z-index:10000;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.footer{text-align:center;padding:50px 20px 60px;color:var(--ink-faint);font-family:var(--font-mono);font-size:.78rem;letter-spacing:.04em}
 
 @media(max-width:768px){
-.featured{grid-template-columns:1fr}
-.stats{grid-template-columns:repeat(2,1fr)}
-.grid.binder{grid-template-columns:repeat(2,1fr)}
-.controls>*{width:100%}
+  .featured{grid-template-columns:1fr}
+  .featured-frame{max-width:240px;margin:0 auto}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .controls>*{width:100%}
+  .cta{flex-direction:column;align-items:flex-start}
 }
 </style>
-
-<style>
-.favorite-glow{
-border:2px solid #facc15 !important;
-box-shadow:0 0 15px rgba(250,204,21,.8),0 0 35px rgba(250,204,21,.45)!important;
-}
-.favorite-btn{
-position:absolute;top:10px;right:10px;z-index:10;
-width:42px;height:42px;border:none;border-radius:50%;
-background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:20px;
-}
-.badge{
-display:inline-block;padding:4px 10px;border-radius:999px;
-font-size:.75rem;margin-top:6px;
-}
-.badge.secret{background:#7c3aed}
-.badge.legend{background:#facc15;color:#111}
-.badge.dark{background:#111}
-.progressWrap{padding:18px}
-.progressBar{height:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.progressFill{height:100%;width:0%;transition:.4s}
-.tabs{display:flex;gap:10px;flex-wrap:wrap;padding:18px}
-.tabs button{
-padding:12px 16px;border:none;border-radius:14px;cursor:pointer;
-background:rgba(255,255,255,.08);color:white;
-}
-</style>
-
 </head>
 <body>
 
-<div class="hero">
-<h1>SHAYDEX</h1>
-<p>The Official Shaylen Trading Card Archive</p>
+<div class="nebula"><i></i><i></i><i></i></div>
+
+<header class="hero">
+  <div class="eyebrow">V. II</div>
+  <h1>SHAYDEX</h1>
+  <p>The Official Shaylen Trading Card Archive</p>
+</header>
+
+<section class="glass featured" id="featuredSection">
+  <div class="featured-frame">
+    <div class="featured-glow" id="featuredGlow"></div>
+    <img id="featuredImg" alt="">
+  </div>
+  <div>
+    <div class="eyebrow-gold">★ Featured Pull</div>
+    <h2 id="featuredName"></h2>
+    <p class="ftype" id="featuredType"></p>
+    <div class="featured-actions">
+      <button class="btn btn-primary" id="jumpFeatured">Jump to card</button>
+      <button class="btn btn-ghost" id="shuffleFeatured">🎲 Shuffle</button>
+    </div>
+  </div>
+</section>
+
+<section class="glass cta">
+  <div>
+    <h2>Got a Shaylen idea?</h2>
+    <p>Pitch a new card and it might earn an official spot in the ShayDex.</p>
+  </div>
+  <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">Submit a card idea</a>
+</section>
+
+<nav class="glass tabbar" role="tablist" aria-label="Card collection views">
+  <button class="tab" id="allCardsBtn" aria-pressed="true">🎴 All Cards</button>
+  <button class="tab" id="binderBtn" aria-pressed="false">📖 My Binder</button>
+  <span class="tab-spacer"></span>
+  <span class="fav-counter" id="favCounter">★ <span id="favCount">0</span> favorited</span>
+</nav>
+
+<section class="glass progressWrap">
+  <div class="progress-row">
+    <span>Collection progress</span>
+    <b id="progressText">0 / 0</b>
+  </div>
+  <div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
+</section>
+
+<section class="glass controls">
+  <label class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input id="search" placeholder="Search by name or rarity…" aria-label="Search cards">
+  </label>
+  <select id="viewMode" aria-label="Change layout">
+    <option value="grid-mode">Grid view</option>
+    <option value="showcase">Showcase view</option>
+    <option value="binder">Binder view</option>
+  </select>
+</section>
+
+<div class="chips" id="rarityChips" role="group" aria-label="Filter by rarity"></div>
+
+<section class="glass stats" id="statsRow"></section>
+
+<div class="empty-state" id="emptyState" hidden>
+  <div class="glyph">🔍</div>
+  <div id="emptyMsg">No Shaylens found. Try another search.</div>
 </div>
 
-<div class="glass featured">
-<img id="featuredImg">
-<div>
-<h3 style="color:#facc15">FEATURED SHAYLEN</h3>
-<h2 id="featuredName"></h2>
-<p id="featuredType" style="color:#94a3b8"></p><br><button id="jumpFeatured" style="padding:12px 18px;border:none;border-radius:14px;background:#facc15;color:#111;font-weight:700;cursor:pointer">Jump To Featured Card</button>
-</div>
-</div>
+<div id="grid" class="grid grid-mode"></div>
 
+<div class="footer">ShayDex · Collect · Discover · Archive</div>
 
-<div class="glass tabs">
-<button id="allCardsBtn">🎴 All Cards</button>
-<button id="binderBtn">📖 My Binder</button>
-<div id="favCounter">⭐ Favorites: 0</div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Card preview">
+  <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+  <button class="modal-nav prev" id="modalPrev" aria-label="Previous card">‹</button>
+  <div class="modal-inner">
+    <img id="modalImg" alt="">
+    <div class="modal-caption" id="modalCaption"></div>
+  </div>
+  <button class="modal-nav next" id="modalNext" aria-label="Next card">›</button>
 </div>
 
-<div class="glass progressWrap">
-<div style="margin-bottom:8px">Collection Progress: <span id="progressText">0 / 17</span></div>
-<div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
-</div>
-
-<div class="glass" style="padding:24px;margin:18px auto;">
-<h2>📸 Submit a Shaylen Card</h2>
-<p style="color:#94a3b8;margin:12px 0">
-Have an idea for a new Shaylen card? Submit it and it may become part of the official ShayDex collection.
-</p>
-<a href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog"
-target="_blank"
-style="display:inline-block;padding:12px 18px;background:#60a5fa;color:white;text-decoration:none;border-radius:14px;font-weight:700">
-Submit a Card Idea
-</a>
-</div>
-
-<div class="glass controls">
-
-<input id="search" placeholder="Search cards..." onkeyup="filterCards()">
-<select id="viewMode" onchange="changeView()">
-<option value="grid">Grid View</option>
-<option value="showcase">Showcase View</option>
-<option value="binder">Binder View</option>
-</select>
-</div>
-
-<div class="glass stats">
-<div class="stat"><b>17</b>Cards</div>
-<div class="stat"><b>6</b>Basic</div>
-<div class="stat"><b>5</b>Rare</div>
-<div class="stat"><b>4</b>Secret</div>
-<div class="stat"><b>1</b>Legend</div>
-</div>
-<div id="emptyState" style="display:none;text-align:center;color:#94a3b8;padding:20px">🔍 No Shaylens found.<br>Try another search term.</div>
-<div id="grid" class="grid"></div>
-
-<div class="modal" id="modal"><img id="modalImg"></div>
-
-
-<div class="glass" style="padding:24px;margin-top:20px">
-<h2>📸 Submit a Shaylen Card</h2>
-<p style="color:#94a3b8;margin:12px 0">Help expand the ShayDex universe by submitting new card ideas.</p>
-<a href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog" target="_blank"
-style="display:inline-block;padding:12px 18px;background:#60a5fa;color:white;text-decoration:none;border-radius:14px;font-weight:700">
-Open Submission Form
-</a>
-</div>
-
-<div class="footer">ShayDex Premium V6 • Collect • Discover • Archive</div>
-
+<div class="toast" id="toast"></div>
 
 <script>
+(function(){
+"use strict";
+
+/* ---------- data ---------- */
 const cards=[
 ['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],
 ['4','Panda Shaylen','Rare'],['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],
@@ -230,202 +411,253 @@ const cards=[
 ['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
 ];
 
-function loadSmart(img,b){
-const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
-let i=0;(function n(){if(i>=tries.length)return;img.onerror=()=>{i++;n()};img.src=tries[i]})();}
+const RARITY_ORDER=['Basic','Rare','Secret Rare','Eternal Legend','Dark'];
+const RARITY_COLOR={Basic:'var(--rarity-basic)',Rare:'var(--rarity-rare)','Secret Rare':'var(--rarity-secret)','Eternal Legend':'var(--rarity-legend)',Dark:'var(--rarity-dark)'};
 
-const featured=cards[Math.floor(Math.random()*cards.length)];
-featuredName.innerText=featured[1];
-featuredType.innerText=featured[2];
-loadSmart(featuredImg,'card_'+featured[0]);
+const FAV_KEY='shaydexFavorites';
+const getFavs=()=>{try{return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]'))}catch(e){return new Set()}};
+const setFavs=s=>localStorage.setItem(FAV_KEY,JSON.stringify([...s]));
+let favs=getFavs();
 
-grid.innerHTML=cards.map(c=>{
-let cls='';
-if(c[2]=='Secret Rare')cls='secret';
-if(c[2]=='Eternal Legend')cls='eternal';
-if(c[2]=='Dark')cls='dark';
-return `<div class="card ${cls}" data-search="${c.join(' ').toLowerCase()}">
-<img data-base="card_${c[0]}">
-<div class="info"><strong>${c[1]}</strong><div class="type">${c[2]}</div></div>
-</div>`;
-}).join('');
+let activeTab='all';        // 'all' | 'binder'
+let activeRarity='all';     // 'all' | rarity name
+let searchTerm='';
+let modalIndex=-1;
+let featured=cards[Math.floor(Math.random()*cards.length)];
 
-
-document.querySelectorAll('[data-base]').forEach(i=>{
-loadSmart(i,i.dataset.base);
-i.onload=()=>i.style.opacity='1';
-});
-
-function updateEmpty(){
-let visible=[...document.querySelectorAll('.card')].filter(c=>c.style.display!=='none').length;
-const es=document.getElementById('emptyState');
-if(es) es.style.display=visible? 'none':'block';
+/* ---------- image loader with extension fallback ---------- */
+function loadSmart(img,base){
+  const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+  let i=0;
+  (function next(){
+    if(i>=tries.length)return;
+    img.onerror=()=>{i++;next()};
+    img.src=tries[i];
+  })();
 }
 
-const jumpBtn=document.getElementById('jumpFeatured');
-if(jumpBtn){
-jumpBtn.onclick=()=>{
-const target=[...document.querySelectorAll('.card')].find(c=>c.dataset.search.includes(featured[1].toLowerCase()));
-if(target) target.scrollIntoView({behavior:'smooth',block:'center'});
+/* ---------- toast ---------- */
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ---------- featured ---------- */
+function renderFeatured(){
+  document.getElementById('featuredName').textContent=featured[1];
+  document.getElementById('featuredType').textContent=featured[2];
+  loadSmart(document.getElementById('featuredImg'),'card_'+featured[0]);
+  document.getElementById('featuredGlow').style.background=RARITY_COLOR[featured[2]]||'var(--gold)';
+}
+document.getElementById('shuffleFeatured').onclick=()=>{
+  featured=cards[Math.floor(Math.random()*cards.length)];
+  renderFeatured();
 };
+document.getElementById('jumpFeatured').onclick=()=>{
+  const target=document.querySelector(`.card[data-id="${featured[0]}"]`);
+  if(!target)return;
+  target.scrollIntoView({behavior:'smooth',block:'center'});
+  target.style.outline='2px solid var(--gold)';
+  setTimeout(()=>target.style.outline='',1200);
+};
+
+/* ---------- stats (computed from data, not hardcoded) ---------- */
+function renderStats(){
+  const counts={};
+  RARITY_ORDER.forEach(r=>counts[r]=0);
+  cards.forEach(c=>counts[c[2]]=(counts[c[2]]||0)+1);
+  const tiles=[['Cards',cards.length],...RARITY_ORDER.map(r=>[r,counts[r]])];
+  document.getElementById('statsRow').innerHTML=tiles.map(([label,n])=>
+    `<div class="stat"><b>${n}</b><span>${label}</span></div>`
+  ).join('');
 }
 
-
-function filterCards(){
-const q=search.value.toLowerCase();
-document.querySelectorAll('.card').forEach(c=>{
-c.style.display=c.dataset.search.includes(q)?'':'none';
-});
-updateEmpty();
+/* ---------- rarity filter chips ---------- */
+function renderChips(){
+  const chips=['all',...RARITY_ORDER];
+  document.getElementById('rarityChips').innerHTML=chips.map(r=>
+    `<button class="chip" data-rarity="${r}" aria-pressed="${r===activeRarity}">${r==='all'?'All rarities':r}</button>`
+  ).join('');
+  document.querySelectorAll('.chip').forEach(btn=>{
+    btn.onclick=()=>{
+      activeRarity=btn.dataset.rarity;
+      document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b===btn));
+      applyFilters();
+    };
+  });
 }
 
-function changeView(){
-grid.className='grid '+viewMode.value;
-}
-changeView();
+/* ---------- grid render ---------- */
+function renderGrid(){
+  const grid=document.getElementById('grid');
+  grid.innerHTML=cards.map(c=>{
+    const id=c[0],name=c[1],rarity=c[2];
+    return `<div class="card" data-id="${id}" data-rarity="${rarity}" data-search="${(name+' '+rarity).toLowerCase()}">
+      <button class="fav-btn" aria-label="Toggle favorite ${name}" aria-pressed="false">☆</button>
+      <div class="card-media">
+        <div class="skeleton"></div>
+        <img data-base="card_${id}" alt="${name} card art">
+      </div>
+      <div class="card-info">
+        <strong>${name}</strong>
+        <span class="rarity-tag"><span class="rarity-dot" style="background:${RARITY_COLOR[rarity]}"></span>${rarity}</span>
+      </div>
+    </div>`;
+  }).join('');
 
-document.querySelectorAll('.card').forEach(card=>{
-card.addEventListener('mousemove',e=>{
-const r=card.getBoundingClientRect();
-const x=(e.clientX-r.left-r.width/2)/(r.width/2);
-const y=(e.clientY-r.top-r.height/2)/(r.height/2);
-card.style.transform=`perspective(1000px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.03)`;
-});
-card.addEventListener('mouseleave',()=>{
-card.style.transform='perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
-});
-});
-
-document.addEventListener('click',e=>{
-if(e.target.matches('.card img')){
-modal.style.display='flex';
-modalImg.src=e.target.src;
-}
-});
-modal.onclick=()=>modal.style.display='none';
-</script>
-
-
-<script>
-const FAVORITES_KEY='shaydexFavorites';
-
-function getFavs(){return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');}
-function setFavs(v){localStorage.setItem(FAVORITES_KEY,JSON.stringify(v));}
-
-function refreshPremium(){
- const favs=getFavs();
- document.getElementById('favCounter').innerHTML='⭐ Favorites: '+favs.length;
-
- document.querySelectorAll('.card').forEach((card,i)=>{
-   const id=String(i+1);
-   card.classList.toggle('favorite-glow',favs.includes(id));
- });
-
- const total=document.querySelectorAll('.card').length;
- document.getElementById('progressText').innerHTML=favs.length+' / '+total;
- document.getElementById('progressFill').style.width=((favs.length/total)*100)+'%';
-}
-
-setTimeout(()=>{
- document.querySelectorAll('.card').forEach((card,i)=>{
-   const id=String(i+1);
-
-   const info=card.querySelector('.info');
-   const rarity=info.querySelector('.type').innerText;
-
-   const badge=document.createElement('div');
-   badge.className='badge';
-   if(rarity.includes('Secret')) badge.classList.add('secret');
-   if(rarity.includes('Legend')) badge.classList.add('legend');
-   if(rarity==='Dark') badge.classList.add('dark');
-   badge.innerText=rarity;
-   info.appendChild(badge);
-
-   const btn=document.createElement('button');
-   btn.className='favorite-btn';
-
-   const draw=()=>{
-      btn.innerHTML=getFavs().includes(id)?'★':'☆';
-   };
-
-   btn.onclick=(e)=>{
-      e.stopPropagation();
-      let favs=getFavs();
-      
-   };
-
-   btn.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      let favs=getFavs();
-      if(favs.includes(id)){
-         favs=favs.filter(x=>x!==id);
-      }else{
-         favs.push(id);
-      }
-      setFavs(favs);
-      draw();
-      refreshPremium();
-   });
-
-   draw();
-   card.appendChild(btn);
- });
-
- refreshPremium();
-
- document.getElementById('binderBtn').onclick=()=>{
-   const favs=getFavs();
-   document.querySelectorAll('.card').forEach((c,i)=>{
-      c.style.display=favs.includes(String(i+1))?'':'none';
-   });
-   updateEmpty();
- };
-
- document.getElementById('allCardsBtn').onclick=()=>{
-   document.querySelectorAll('.card').forEach(c=>c.style.display='');
-   updateEmpty();
- };
-},250);
-</script>
-
-
-<script>
-(function(){
-function fixFavorites(){
-  const counter=document.getElementById('favCounter');
-  const fill=document.getElementById('progressFill');
-  const text=document.getElementById('progressText');
-
-  function refresh(){
-    const stars=[...document.querySelectorAll('.favorite-btn')]
-      .filter(b=>b.innerHTML.includes('★')).length;
-
-    if(counter) counter.innerHTML='⭐ Favorites: '+stars;
-
-    const total=document.querySelectorAll('.card').length;
-
-    if(fill) fill.style.width=((stars/Math.max(total,1))*100)+'%';
-    if(text) text.textContent=stars+' / '+total;
-
-    document.querySelectorAll('.card').forEach(card=>{
-      if(!card.classList.contains('favorite-glow')){
-        card.style.transform='perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
-      }
+  grid.querySelectorAll('[data-base]').forEach(img=>{
+    loadSmart(img,img.dataset.base);
+    img.addEventListener('load',()=>{
+      img.classList.add('loaded');
+      img.closest('.card-media').querySelector('.skeleton').classList.add('hide');
     });
-  }
-
-  document.addEventListener('click',e=>{
-    if(e.target.classList.contains('favorite-btn')){
-      setTimeout(refresh,20);
-    }
   });
 
-  refresh();
+  grid.querySelectorAll('.fav-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const card=btn.closest('.card');
+      const id=card.dataset.id;
+      const name=card.querySelector('strong').textContent;
+      if(favs.has(id)){favs.delete(id);showToast(name+' removed from binder');}
+      else{favs.add(id);showToast(name+' added to binder');}
+      setFavs(favs);
+      syncFavoriteUI();
+      if(activeTab==='binder')applyFilters();
+    });
+  });
+
+  grid.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left-r.width/2)/(r.width/2);
+      const y=(e.clientY-r.top-r.height/2)/(r.height/2);
+      card.style.transform=`perspective(1000px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.025)`;
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform='';});
+    card.querySelector('.card-media').addEventListener('click',()=>{
+      modalIndex=cards.findIndex(c=>c[0]===card.dataset.id);
+      openModal();
+    });
+  });
+
+  syncFavoriteUI();
+  staggerIn();
 }
 
-setTimeout(fixFavorites,500);
+function staggerIn(){
+  const items=[...document.querySelectorAll('.card')].filter(c=>c.style.display!=='none');
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+    });
+  },{threshold:.1});
+  items.forEach((c,i)=>{
+    setTimeout(()=>io.observe(c),i*15);
+  });
+}
+
+function syncFavoriteUI(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const id=card.dataset.id;
+    const isFav=favs.has(id);
+    card.classList.toggle('favorited',isFav);
+    const btn=card.querySelector('.fav-btn');
+    btn.textContent=isFav?'★':'☆';
+    btn.setAttribute('aria-pressed',String(isFav));
+  });
+  document.getElementById('favCount').textContent=favs.size;
+  const total=cards.length;
+  document.getElementById('progressText').textContent=favs.size+' / '+total;
+  document.getElementById('progressFill').style.width=(favs.size/total*100)+'%';
+}
+
+/* ---------- filtering ---------- */
+function applyFilters(){
+  const q=searchTerm.trim().toLowerCase();
+  let visible=0;
+  document.querySelectorAll('.card').forEach(card=>{
+    const id=card.dataset.id;
+    const matchesTab=activeTab==='all'||favs.has(id);
+    const matchesRarity=activeRarity==='all'||card.dataset.rarity===activeRarity;
+    const matchesSearch=!q||card.dataset.search.includes(q);
+    const show=matchesTab&&matchesRarity&&matchesSearch;
+    card.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  const empty=document.getElementById('emptyState');
+  const emptyMsg=document.getElementById('emptyMsg');
+  if(visible===0){
+    empty.hidden=false;
+    emptyMsg.textContent=(activeTab==='binder'&&favs.size===0)
+      ? 'Your binder is empty. Tap the star on any card to add it here.'
+      : 'No Shaylens found. Try another search.';
+  }else{
+    empty.hidden=true;
+  }
+}
+
+/* ---------- tabs ---------- */
+document.getElementById('allCardsBtn').onclick=()=>{
+  activeTab='all';
+  document.getElementById('allCardsBtn').setAttribute('aria-pressed','true');
+  document.getElementById('binderBtn').setAttribute('aria-pressed','false');
+  applyFilters();
+};
+document.getElementById('binderBtn').onclick=()=>{
+  activeTab='binder';
+  document.getElementById('binderBtn').setAttribute('aria-pressed','true');
+  document.getElementById('allCardsBtn').setAttribute('aria-pressed','false');
+  applyFilters();
+};
+
+/* ---------- search / view ---------- */
+document.getElementById('search').addEventListener('input',e=>{
+  searchTerm=e.target.value;
+  applyFilters();
+});
+document.getElementById('viewMode').addEventListener('change',e=>{
+  document.getElementById('grid').className='grid '+e.target.value;
+});
+
+/* ---------- modal ---------- */
+function openModal(){
+  const c=cards[modalIndex];
+  const modal=document.getElementById('modal');
+  loadSmart(document.getElementById('modalImg'),'card_'+c[0]);
+  document.getElementById('modalCaption').textContent=c[1]+' · '+c[2];
+  modal.classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function navModal(dir){
+  modalIndex=(modalIndex+dir+cards.length)%cards.length;
+  openModal();
+}
+document.getElementById('modalClose').onclick=closeModal;
+document.getElementById('modalPrev').onclick=()=>navModal(-1);
+document.getElementById('modalNext').onclick=()=>navModal(1);
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal')closeModal();
+});
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('modal').classList.contains('open'))return;
+  if(e.key==='Escape')closeModal();
+  if(e.key==='ArrowLeft')navModal(-1);
+  if(e.key==='ArrowRight')navModal(1);
+});
+
+/* ---------- init ---------- */
+renderFeatured();
+renderStats();
+renderChips();
+renderGrid();
+applyFilters();
+
 })();
 </script>
-
 </body>
 </html>
