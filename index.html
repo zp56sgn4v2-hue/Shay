@@ -3,74 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShayDex V10</title>
+<title>ShayDex</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-font-family:Inter,system-ui,sans-serif;
-background:linear-gradient(180deg,#050816,#0f172a);
-color:white;min-height:100vh;overflow-x:hidden;
-}
-body::before,body::after{
-content:'';position:fixed;border-radius:50%;filter:blur(90px);z-index:-1;
-animation:float 20s ease-in-out infinite alternate;
-}
-body::before{width:400px;height:400px;background:#7c3aed44;left:-100px;top:-50px}
-body::after{width:350px;height:350px;background:#06b6d433;right:-100px;top:100px}
-@keyframes float{from{transform:translateY(0)}to{transform:translateY(80px)}}
+body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#050816,#0f172a);color:#fff;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(100px);z-index:-1;animation:float 18s ease-in-out infinite alternate}
+body:before{width:420px;height:420px;background:#7c3aed44;left:-100px;top:-50px}
+body:after{width:380px;height:380px;background:#06b6d433;right:-120px;top:80px}
+@keyframes float{from{transform:translateY(0)}to{transform:translateY(90px)}}
 
-header{text-align:center;padding:50px 20px 20px}
+header{text-align:center;padding:50px 20px 10px}
 h1{font-size:5rem;font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
-.subtitle{max-width:700px;margin:10px auto;color:#94a3b8}
+.subtitle{color:#94a3b8;margin-top:8px}
 
-.ticker{overflow:hidden;white-space:nowrap;padding:10px 0;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
-.ticker span{display:inline-block;padding-left:100%;animation:scroll 25s linear infinite;color:#facc15;font-weight:700}
+.ticker{overflow:hidden;white-space:nowrap;padding:10px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+.ticker span{display:inline-block;padding-left:100%;animation:scroll 24s linear infinite;color:#facc15;font-weight:700}
 @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 
-.featured,.stats{
-max-width:1100px;margin:18px auto;padding:16px 20px;
-background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-border-radius:20px;text-align:center
-}
-.controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:20px}
-input,select{
-padding:14px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.1);
-background:rgba(255,255,255,.06);color:white
-}
-.grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
-.card{
+.hero,.stats,.fact,footer{
+max-width:1100px;margin:18px auto;padding:18px 22px;
 background:rgba(255,255,255,.05);
 border:1px solid rgba(255,255,255,.08);
-border-radius:28px;overflow:hidden;
-transition:.3s;opacity:0;transform:translateY(20px);
-animation:appear .6s forwards;
+border-radius:24px;text-align:center;
+backdrop-filter:blur(16px)
 }
-.card:nth-child(n){animation-delay:calc(var(--i) * .05s)}
-@keyframes appear{to{opacity:1;transform:translateY(0)}}
-.card:hover{transform:translateY(-8px) rotateX(2deg) scale(1.02);box-shadow:0 25px 50px rgba(0,0,0,.45)}
-.card img{width:100%;display:block;cursor:pointer}
-.secret-card{position:relative;overflow:hidden}
-.secret-card::after{
-content:'';position:absolute;inset:0;
-background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
-transform:translateX(-120%);
-animation:shine 4s infinite;
-pointer-events:none;
-}
-@keyframes shine{to{transform:translateX(120%)}}
-.info{padding:16px}
-.number{color:#94a3b8;font-size:.85rem}
-.name{font-size:1.15rem;font-weight:800}
-.type{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:700}
-.basic{background:#cbd5e1;color:black}.rare{background:#60a5fa;color:black}
-.secret{background:#facc15;color:black}.eternal{background:#10b981}.dark{background:#111827;border:1px solid #374151}
+.hero img{max-width:220px;border-radius:18px;margin-bottom:12px}
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);justify-content:center;align-items:center;z-index:9999;padding:20px}
-.modal-content{max-width:1000px;display:flex;gap:25px;flex-wrap:wrap;align-items:center}
-.modal img{max-width:400px;max-height:80vh;border-radius:20px}
-.details{max-width:400px}
-.details h2{margin-bottom:10px}
+.controls{
+position:sticky;top:12px;z-index:100;
+display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+max-width:1000px;margin:20px auto;padding:16px;
+background:rgba(5,8,22,.75);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+border-radius:24px;
+}
+input,select{
+padding:14px 18px;border-radius:18px;
+border:1px solid rgba(255,255,255,.1);
+background:rgba(255,255,255,.06);color:white
+}
+
 .resultCount{text-align:center;color:#94a3b8}
+.grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;overflow:hidden;transition:.3s;opacity:0;transform:translateY(20px);animation:appear .6s forwards}
+@keyframes appear{to{opacity:1;transform:translateY(0)}}
+.card:hover{transform:translateY(-10px) scale(1.03);box-shadow:0 25px 50px rgba(0,0,0,.45)}
+.card img{width:100%;display:block;cursor:pointer}
+.secret-card{position:relative}
+.secret-card:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 4s infinite}
+@keyframes shine{to{transform:translateX(120%)}}
+.info{padding:16px}.number{color:#94a3b8}.name{font-weight:800;font-size:1.1rem}
+.type{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:700}
+.basic{background:#cbd5e1;color:#000}
+.rare{background:#60a5fa;color:#000}
+.secret{background:linear-gradient(90deg,#facc15,#fff3a3,#facc15);color:#000;box-shadow:0 0 15px rgba(250,204,21,.4)}
+.eternal{background:linear-gradient(90deg,#10b981,#6ee7b7,#10b981);box-shadow:0 0 15px rgba(16,185,129,.4)}
+.dark{background:#111827;border:1px solid #374151}
+
+#emptyState{display:none;text-align:center;color:#94a3b8;padding:30px}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);justify-content:center;align-items:center;z-index:9999;padding:20px}
+.modal-content{display:flex;gap:25px;flex-wrap:wrap;align-items:center}
+.modal img{max-width:420px;max-height:85vh;border-radius:20px}
 </style>
 </head>
 <body>
@@ -81,7 +76,8 @@ pointer-events:none;
 
 <div class="ticker"><span>🔥 NEW CARD DROPS EVERY WEEK • SECRET RARES DISCOVERED • CHECK BACK FOR NEW SHAYLENS 🔥</span></div>
 
-<div class="featured" id="featured"></div>
+<div class="hero" id="hero"></div>
+<div class="fact" id="fact"></div>
 
 <div class="controls">
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
@@ -89,26 +85,18 @@ pointer-events:none;
 <option value="all">All Types</option><option>Basic</option><option>Rare</option><option>Secret Rare</option><option>Eternal Legend</option><option>Dark</option>
 </select>
 <select id="sort" onchange="renderCards()">
-<option value="number">Sort: Number</option>
-<option value="name">Sort: Name</option>
-<option value="rarity">Sort: Rarity</option>
+<option value="number">Sort: Number</option><option value="name">Sort: Name</option><option value="rarity">Sort: Rarity</option>
 </select>
 </div>
 
 <div class="stats">17 Cards • 6 Basic • 5 Rare • 4 Secret Rare • 1 Eternal Legend • 1 Dark</div>
 <div class="resultCount" id="resultCount"></div>
+<div id="emptyState">No Shaylens found. Try another search.</div>
 <div class="grid" id="grid"></div>
 
-<div class="modal" id="modal">
-<div class="modal-content">
-<img id="modalImg">
-<div class="details">
-<h2 id="modalName"></h2>
-<p id="modalMeta"></p><br>
-<p>Part of the legendary ShayDex collection.</p>
-</div>
-</div>
-</div>
+<div class="modal" id="modal"><div class="modal-content"><img id="modalImg"><div><h2 id="modalName"></h2><p id="modalMeta"></p></div></div></div>
+
+<footer>ShayDex Archive • 17 Cards Cataloged</footer>
 
 <script>
 const cards=[
@@ -119,58 +107,63 @@ const cards=[
 ['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
 ];
 
+const facts=[
+"Christmas Shaylen is the only Eternal Legend card.",
+"Shuggie is one of the rarest Shaylens ever discovered.",
+"Dragon Shaylen possesses legendary status.",
+"Devious Shaylen remains highly mysterious."
+];
+document.getElementById('fact').innerHTML="💡 "+facts[Math.floor(Math.random()*facts.length)];
+
 const featured=cards[Math.floor(Math.random()*cards.length)];
-document.getElementById('featured').innerHTML='⭐ Featured Shaylen: <b>'+featured[1]+'</b>';
+document.getElementById('hero').innerHTML=`<div style="font-size:.8rem;color:#94a3b8">FEATURED SHAYLEN</div><h2>${featured[1]}</h2><div>${featured[2]}</div><img id="featuredImg" data-base="card_${featured[0]}">`;
 
 function rarityRank(t){return {'Secret Rare':1,'Eternal Legend':2,'Dark':3,'Rare':4,'Basic':5}[t]||99}
 
+function loadSmart(img){
+const b=img.dataset.base; const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
+let i=0; (function n(){if(i>=tries.length)return; img.onerror=()=>{i++;n()}; img.src=tries[i]})();
+}
+
 function renderCards(){
-const grid=document.getElementById('grid');
-let arr=[...cards];
+let arr=[...cards],grid=document.getElementById('grid');
 const sort=document.getElementById('sort').value;
 if(sort==='name')arr.sort((a,b)=>a[1].localeCompare(b[1]));
 if(sort==='rarity')arr.sort((a,b)=>rarityRank(a[2])-rarityRank(b[2]));
 grid.innerHTML='';
-arr.forEach((c,i)=>{
-const cls=c[2]==='Secret Rare'?'secret-card':'';
-grid.innerHTML+=`<div class="card ${cls}" style="--i:${i}" data-type="${c[2]}">
-<img data-base="card_${c[0]}" data-name="${c[1]}" data-typex="${c[2]}" data-num="${c[0]}">
-<div class="info"><div class="number">#${String(c[0]).padStart(3,'0')}</div><div class="name">${c[1]}</div><div class="type">${c[2]}</div></div></div>`;
+arr.forEach(c=>{
+const badge=c[2]=='Basic'?'basic':c[2]=='Rare'?'rare':c[2]=='Secret Rare'?'secret':c[2]=='Dark'?'dark':'eternal';
+grid.innerHTML+=`<div class="card ${c[2]=='Secret Rare'?'secret-card':''}" data-type="${c[2]}"><img data-base="card_${c[0]}" data-name="${c[1]}" data-typex="${c[2]}" data-num="${c[0]}"><div class="info"><div class="number">#${String(c[0]).padStart(3,'0')}</div><div class="name">${c[1]}</div><div class="type ${badge}">${c[2]}</div></div></div>`;
 });
 document.querySelectorAll('img[data-base]').forEach(loadSmart);
 filterCards();
 }
 
-function loadSmart(img){
-const b=img.dataset.base;
-const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP',b];
-let i=0;(function next(){if(i>=tries.length)return;img.onerror=()=>{i++;next()};img.src=tries[i]})();
-}
-
 function filterCards(){
-const q=document.getElementById('search').value.toLowerCase();
-const t=document.getElementById('typeFilter').value;
+const q=search.value.toLowerCase(), t=typeFilter.value;
 let shown=0;
 document.querySelectorAll('.card').forEach(card=>{
 const ok=card.innerText.toLowerCase().includes(q)&&(t==='all'||card.dataset.type===t);
 card.style.display=ok?'':'none';
 if(ok) shown++;
 });
-document.getElementById('resultCount').innerText=`Showing ${shown} of 17 cards`;
+resultCount.innerText=`Showing ${shown} of 17 cards`;
+emptyState.style.display=shown===0?'block':'none';
 }
 
 renderCards();
+loadSmart(document.getElementById('featuredImg'));
 
-const modal=document.getElementById('modal');
 document.addEventListener('click',e=>{
 if(e.target.matches('.card img')){
-document.getElementById('modalImg').src=e.target.src;
-document.getElementById('modalName').innerText=e.target.dataset.name;
-document.getElementById('modalMeta').innerText='#'+String(e.target.dataset.num).padStart(3,'0')+' • '+e.target.dataset.typex;
 modal.style.display='flex';
+modalImg.src=e.target.src;
+modalName.innerText=e.target.dataset.name;
+modalMeta.innerText='#'+String(e.target.dataset.num).padStart(3,'0')+' • '+e.target.dataset.typex;
 }
 });
 modal.onclick=()=>modal.style.display='none';
+document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.style.display='none'});
 </script>
 </body>
 </html>
