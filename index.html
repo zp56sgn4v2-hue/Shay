@@ -6,10 +6,16 @@
 <title>ShayDex V5.1</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+html{
+background:linear-gradient(180deg,#050816,#0f172a);
+}
 body{
 font-family:Inter,system-ui,sans-serif;
 background:linear-gradient(180deg,#050816,#0f172a);
-color:white;min-height:100vh;overflow-x:hidden;
+color:white;
+min-height:100vh;
+overflow-x:hidden;
+margin:0;
 }
 body:before,body:after{
 content:"";position:fixed;border-radius:50%;filter:blur(140px);z-index:-1;
@@ -155,7 +161,6 @@ z-index:9999;padding:20px;
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
 <select id="viewMode" onchange="changeView()">
 <option value="grid">Grid View</option>
-<option value="showcase">Showcase View</option>
 <option value="binder">Binder View</option>
 </select>
 </div>
@@ -214,7 +219,7 @@ c.style.display=c.dataset.search.includes(q)?'':'none';
 }
 
 function changeView(){
-grid.className='grid '+viewMode.value;
+grid.className='grid '+(viewMode.value || 'grid');
 }
 changeView();
 
