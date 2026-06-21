@@ -116,6 +116,34 @@ z-index:9999;padding:20px;
 .controls>*{width:100%}
 }
 </style>
+
+<style>
+.favorite-glow{
+border:2px solid #facc15 !important;
+box-shadow:0 0 15px rgba(250,204,21,.8),0 0 35px rgba(250,204,21,.45)!important;
+}
+.favorite-btn{
+position:absolute;top:10px;right:10px;z-index:10;
+width:42px;height:42px;border:none;border-radius:50%;
+background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:20px;
+}
+.badge{
+display:inline-block;padding:4px 10px;border-radius:999px;
+font-size:.75rem;margin-top:6px;
+}
+.badge.secret{background:#7c3aed}
+.badge.legend{background:#facc15;color:#111}
+.badge.dark{background:#111}
+.progressWrap{padding:18px}
+.progressBar{height:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.progressFill{height:100%;width:0%;transition:.4s}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;padding:18px}
+.tabs button{
+padding:12px 16px;border:none;border-radius:14px;cursor:pointer;
+background:rgba(255,255,255,.08);color:white;
+}
+</style>
+
 </head>
 <body>
 
@@ -133,7 +161,20 @@ z-index:9999;padding:20px;
 </div>
 </div>
 
+
+<div class="glass tabs">
+<button id="allCardsBtn">🎴 All Cards</button>
+<button id="binderBtn">📖 My Binder</button>
+<div id="favCounter">⭐ Favorites: 0</div>
+</div>
+
+<div class="glass progressWrap">
+<div style="margin-bottom:8px">Collection Progress: <span id="progressText">0 / 17</span></div>
+<div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
+</div>
+
 <div class="glass controls">
+
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
 <select id="viewMode" onchange="changeView()">
 <option value="grid">Grid View</option>
@@ -154,7 +195,18 @@ z-index:9999;padding:20px;
 
 <div class="modal" id="modal"><img id="modalImg"></div>
 
-<div class="footer">ShayDex • Collect • Discover • Archive</div>
+
+<div class="glass" style="padding:24px;margin-top:20px">
+<h2>📸 Submit a Shaylen Card</h2>
+<p style="color:#94a3b8;margin:12px 0">Help expand the ShayDex universe by submitting new card ideas.</p>
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog" target="_blank"
+style="display:inline-block;padding:12px 18px;background:#60a5fa;color:white;text-decoration:none;border-radius:14px;font-weight:700">
+Open Submission Form
+</a>
+</div>
+
+<div class="footer">ShayDex Premium V6 • Collect • Discover • Archive</div>
+
 
 <script>
 const cards=[
@@ -239,6 +291,89 @@ modalImg.src=e.target.src;
 }
 });
 modal.onclick=()=>modal.style.display='none';
+</script>
+
+
+<script>
+const FAVORITES_KEY='shaydexFavorites';
+
+function getFavs(){return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');}
+function setFavs(v){localStorage.setItem(FAVORITES_KEY,JSON.stringify(v));}
+
+function refreshPremium(){
+ const favs=getFavs();
+ document.getElementById('favCounter').innerHTML='⭐ Favorites: '+favs.length;
+
+ document.querySelectorAll('.card').forEach((card,i)=>{
+   const id=String(i+1);
+   card.classList.toggle('favorite-glow',favs.includes(id));
+ });
+
+ const total=document.querySelectorAll('.card').length;
+ document.getElementById('progressText').innerHTML=favs.length+' / '+total;
+ document.getElementById('progressFill').style.width=((favs.length/total)*100)+'%';
+}
+
+setTimeout(()=>{
+ document.querySelectorAll('.card').forEach((card,i)=>{
+   const id=String(i+1);
+
+   const info=card.querySelector('.info');
+   const rarity=info.querySelector('.type').innerText;
+
+   const badge=document.createElement('div');
+   badge.className='badge';
+   if(rarity.includes('Secret')) badge.classList.add('secret');
+   if(rarity.includes('Legend')) badge.classList.add('legend');
+   if(rarity==='Dark') badge.classList.add('dark');
+   badge.innerText=rarity;
+   info.appendChild(badge);
+
+   const btn=document.createElement('button');
+   btn.className='favorite-btn';
+
+   const draw=()=>{
+      btn.innerHTML=getFavs().includes(id)?'★':'☆';
+   };
+
+   btn.onclick=(e)=>{
+      e.stopPropagation();
+      let favs=getFavs();
+      
+   };
+
+   btn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      let favs=getFavs();
+      if(favs.includes(id)){
+         favs=favs.filter(x=>x!==id);
+      }else{
+         favs.push(id);
+      }
+      setFavs(favs);
+      draw();
+      refreshPremium();
+   });
+
+   draw();
+   card.appendChild(btn);
+ });
+
+ refreshPremium();
+
+ document.getElementById('binderBtn').onclick=()=>{
+   const favs=getFavs();
+   document.querySelectorAll('.card').forEach((c,i)=>{
+      c.style.display=favs.includes(String(i+1))?'':'none';
+   });
+   updateEmpty();
+ };
+
+ document.getElementById('allCardsBtn').onclick=()=>{
+   document.querySelectorAll('.card').forEach(c=>c.style.display='');
+   updateEmpty();
+ };
+},250);
 </script>
 
 </body>
