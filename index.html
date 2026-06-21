@@ -3,136 +3,305 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShayDex Launch V3.1</title>
+<title>ShayDex V4 Neo Edition</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#050816,#0f172a);color:#fff;overflow-x:hidden}
-body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(120px);z-index:-1}
-body:before{width:500px;height:500px;background:#7c3aed33;left:-150px;top:-100px}
-body:after{width:450px;height:450px;background:#06b6d433;right:-150px;top:0}
+:root{
+--bg:#050816;
+--panel:rgba(255,255,255,.05);
+--border:rgba(255,255,255,.08);
+--text:#ffffff;
+--muted:#94a3b8;
+--gold:#facc15;
+--pink:#f472b6;
+--blue:#60a5fa;
+}
+body{
+font-family:Inter,system-ui,sans-serif;
+background:linear-gradient(180deg,#050816,#0f172a);
+color:var(--text);
+overflow-x:hidden;
+min-height:100vh;
+}
+body:before,body:after{
+content:"";
+position:fixed;
+border-radius:50%;
+filter:blur(140px);
+z-index:-1;
+}
+body:before{
+width:600px;height:600px;
+background:#7c3aed33;
+left:-200px;top:-150px;
+}
+body:after{
+width:500px;height:500px;
+background:#06b6d433;
+right:-180px;top:0;
+}
 
-.hero{max-width:1100px;margin:auto;text-align:center;padding:50px 20px 20px}
-.hero h1{font-size:clamp(3rem,10vw,6rem);line-height:1;font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
-.hero p{color:#94a3b8;margin-top:10px}
+.hero{
+padding:60px 20px 30px;
+text-align:center;
+}
+.hero h1{
+font-size:clamp(4rem,14vw,8rem);
+font-weight:900;
+letter-spacing:-3px;
+background:linear-gradient(90deg,var(--gold),var(--pink),var(--blue));
+-webkit-background-clip:text;
+color:transparent;
+}
+.hero p{
+color:var(--muted);
+font-size:1.1rem;
+max-width:700px;
+margin:10px auto;
+}
 
-.featured,.footerbox{max-width:1100px;margin:20px auto;padding:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;backdrop-filter:blur(18px)}
-.featured{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
-.featured img{width:100%;max-width:320px;margin:auto;border-radius:20px;display:block}
+.glass{
+width:min(94%,1200px);
+margin:18px auto;
+background:var(--panel);
+backdrop-filter:blur(24px);
+border:1px solid var(--border);
+border-radius:30px;
+}
+
+.featured{
+display:grid;
+grid-template-columns:350px 1fr;
+gap:30px;
+padding:30px;
+align-items:center;
+}
+.featured img{
+width:100%;
+border-radius:24px;
+box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.badge{
+display:inline-block;
+padding:8px 14px;
+border-radius:999px;
+background:linear-gradient(90deg,var(--gold),#fb7185);
+color:#111;
+font-weight:800;
+margin-bottom:12px;
+}
 
 .controls{
-position:relative;
-z-index:10;
-width:min(95%,1100px);
-margin:20px auto;
-padding:16px;
 display:flex;
 gap:12px;
+padding:18px;
 flex-wrap:wrap;
-justify-content:center;
-background:rgba(5,8,22,.8);
-backdrop-filter:blur(20px);
-border-radius:22px;
 }
-input,select{padding:14px 18px;border:none;border-radius:16px;background:rgba(255,255,255,.08);color:white}
+input,select{
+flex:1;
+min-width:180px;
+padding:16px;
+border:none;
+border-radius:18px;
+background:rgba(255,255,255,.08);
+color:white;
+}
 
-.stats{max-width:1100px;margin:20px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
-.stat{background:rgba(255,255,255,.05);padding:18px;border-radius:20px;text-align:center}
-.stat b{display:block;font-size:2rem}
+.stats{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:12px;
+padding:18px;
+}
+.stat{
+padding:18px;
+text-align:center;
+background:rgba(255,255,255,.04);
+border-radius:18px;
+}
+.stat b{
+display:block;
+font-size:2rem;
+}
 
-.grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
-.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;overflow:hidden;transition:.3s}
-.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 50px rgba(0,0,0,.45)}
-.card img{width:100%;display:block;cursor:pointer}
-.info{padding:16px}.number{color:#94a3b8}.name{font-size:1.1rem;font-weight:800}
-.resultCount{text-align:center;color:#94a3b8;padding-bottom:10px}
-#emptyState{display:none;text-align:center;color:#94a3b8;padding:30px}
+.grid{
+width:min(95%,1500px);
+margin:25px auto 50px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:22px;
+}
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);justify-content:center;align-items:center;padding:20px;z-index:9999}
-.modal img{max-width:420px;max-height:85vh;border-radius:20px}
+.card{
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.08);
+border-radius:24px;
+overflow:hidden;
+transition:.35s;
+position:relative;
+}
+.card:hover{
+transform:translateY(-10px) scale(1.03);
+box-shadow:0 25px 60px rgba(0,0,0,.5);
+}
+.card img{
+width:100%;
+display:block;
+}
+.info{padding:16px}
+.num{color:var(--muted);font-size:.85rem}
+.name{font-weight:800;font-size:1.15rem;margin-top:4px}
+.type{
+display:inline-block;
+margin-top:10px;
+padding:6px 12px;
+border-radius:999px;
+font-size:.85rem;
+font-weight:700;
+}
 
-@media(max-width:768px){
-.controls{flex-direction:column}
-input,select{width:100%}
+.basic{background:#cbd5e1;color:#111}
+.rare{background:#60a5fa;color:#111}
+.secret{background:#facc15;color:#111}
+.eternal{background:#10b981}
+.dark{background:#111827;border:1px solid #374151}
+
+.footer{
+text-align:center;
+padding:30px;
+color:var(--muted);
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.85);
+backdrop-filter:blur(18px);
+justify-content:center;
+align-items:center;
+z-index:9999;
+padding:20px;
+}
+.modal img{
+max-width:500px;
+max-height:85vh;
+border-radius:24px;
+}
+
+@media(max-width:900px){
+.featured{grid-template-columns:1fr}
+.stats{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
 <body>
-<div class="hero">
+
+<section class="hero">
 <h1>SHAYDEX</h1>
-<p>The Official Shaylen Trading Card Archive</p>
-</div>
+<p>The Official Shaylen Trading Card Archive • Collect • Discover • Archive</p>
+</section>
 
-<div class="featured">
-<div><img id="featuredImg"></div>
-<div><h2 id="featuredName"></h2><p id="featuredType"></p></div>
+<section class="glass featured">
+<img id="featuredImg">
+<div>
+<div class="badge">FEATURED SHAYLEN</div>
+<h2 id="featuredName"></h2>
+<p id="featuredType" style="color:#94a3b8;margin-top:10px"></p>
 </div>
+</section>
 
-<div class="stats">
+<section class="glass stats">
 <div class="stat"><b>17</b>Cards</div>
 <div class="stat"><b>6</b>Basic</div>
 <div class="stat"><b>5</b>Rare</div>
 <div class="stat"><b>4</b>Secret Rare</div>
-<div class="stat"><b>1</b>Eternal Legend</div>
-</div>
+<div class="stat"><b>1</b>Legend</div>
+</section>
 
-<div class="controls">
-<input id="search" placeholder="Search cards..." onkeyup="filterCards()">
+<section class="glass controls">
+<input id="search" placeholder="Search Shaylens..." onkeyup="filterCards()">
 <select id="typeFilter" onchange="filterCards()">
-<option value="all">All Types</option><option>Basic</option><option>Rare</option><option>Secret Rare</option><option>Eternal Legend</option><option>Dark</option>
+<option value="all">All Types</option>
+<option>Basic</option>
+<option>Rare</option>
+<option>Secret Rare</option>
+<option>Eternal Legend</option>
+<option>Dark</option>
 </select>
-</div>
+</section>
 
-<div class="resultCount" id="resultCount"></div>
-<div id="emptyState">No Shaylens found.</div>
 <div class="grid" id="grid"></div>
 
-<div class="modal" id="modal"><img id="modalImg"></div>
+<div class="modal" id="modal">
+<img id="modalImg">
+</div>
 
-<div class="footerbox">ShayDex • Collect • Discover • Archive</div>
+<div class="footer">ShayDex V4 • Neo Edition</div>
 
 <script>
 const cards=[
-['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],['4','Panda Shaylen','Rare'],
-['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],['7','Pickle Shaylen','Rare'],
-['8','Dragon Shaylen','Secret Rare'],['9','Bald Shaylen','Basic'],['10','Shuggie','Secret Rare'],
-['11','Baby Shaylen','Basic'],['12','Christmas Shaylen','Eternal Legend'],['13','Devious Shaylen','Secret Rare'],
-['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
+['1','Silly Shaylen','Basic'],
+['2','Beaver Shaylen','Rare'],
+['3','Sandy Shaylen','Rare'],
+['4','Panda Shaylen','Rare'],
+['5',"Cheesin' Shaylen",'Rare'],
+['6','Princess Shaylen','Secret Rare'],
+['7','Pickle Shaylen','Rare'],
+['8','Dragon Shaylen','Secret Rare'],
+['9','Bald Shaylen','Basic'],
+['10','Shuggie','Secret Rare'],
+['11','Baby Shaylen','Basic'],
+['12','Christmas Shaylen','Eternal Legend'],
+['13','Devious Shaylen','Secret Rare'],
+['14','Shocker Shaylen','Basic'],
+['15','Evil Shaylen','Dark'],
+['16','Innocent Shaylen','Basic'],
+['17','Hefty Shaylen','Basic']
 ];
 
 function loadSmart(img,b){
 const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
-let i=0;(function n(){if(i>=tries.length)return;img.onerror=()=>{i++;n()};img.src=tries[i]})();
-}
+let i=0;(function n(){if(i>=tries.length)return;img.onerror=()=>{i++;n()};img.src=tries[i]})();}
 
-const f=cards[Math.floor(Math.random()*cards.length)];
-featuredName.innerText=f[1];
-featuredType.innerText=f[2];
-loadSmart(featuredImg,'card_'+f[0]);
+const featured=cards[Math.floor(Math.random()*cards.length)];
+featuredName.innerText=featured[1];
+featuredType.innerText=featured[2];
+loadSmart(featuredImg,'card_'+featured[0]);
+
+const badgeClass=t=>t==='Basic'?'basic':t==='Rare'?'rare':t==='Secret Rare'?'secret':t==='Eternal Legend'?'eternal':'dark';
 
 grid.innerHTML=cards.map(c=>`
 <div class="card" data-type="${c[2]}">
-<img data-base="card_${c[0]}">
-<div class="info"><div class="number">#${c[0].padStart ? c[0].padStart(3,'0'):c[0]}</div><div class="name">${c[1]}</div></div>
+<img data-base="card_${c[0]}" data-full="card_${c[0]}">
+<div class="info">
+<div class="num">#${String(c[0]).padStart(3,'0')}</div>
+<div class="name">${c[1]}</div>
+<div class="type ${badgeClass(c[2])}">${c[2]}</div>
+</div>
 </div>`).join('');
 
 document.querySelectorAll('[data-base]').forEach(i=>loadSmart(i,i.dataset.base));
 
 function filterCards(){
-const q=search.value.toLowerCase(), t=typeFilter.value;
-let shown=0;
-document.querySelectorAll('.card').forEach(c=>{
-const ok=c.innerText.toLowerCase().includes(q)&&(t==='all'||c.dataset.type===t);
-c.style.display=ok?'':'none'; if(ok) shown++;
+const q=document.getElementById('search').value.toLowerCase();
+const t=document.getElementById('typeFilter').value;
+document.querySelectorAll('.card').forEach(card=>{
+const ok=card.innerText.toLowerCase().includes(q)&&(t==='all'||card.dataset.type===t);
+card.style.display=ok?'':'none';
 });
-resultCount.innerText=`Showing ${shown} of 17 cards`;
-emptyState.style.display=shown===0?'block':'none';
 }
-filterCards();
 
+const modal=document.getElementById('modal');
 document.addEventListener('click',e=>{
-if(e.target.matches('.card img')){modal.style.display='flex';modalImg.src=e.target.src;}
+if(e.target.matches('.card img')){
+modal.style.display='flex';
+modalImg.src=e.target.src;
+}
 });
 modal.onclick=()=>modal.style.display='none';
 </script>
+
 </body>
 </html>
