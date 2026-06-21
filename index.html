@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShayDex Launch V3</title>
+<title>ShayDex Launch V3.1</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#050816,#0f172a);color:#fff;overflow-x:hidden}
@@ -15,48 +15,44 @@ body:after{width:450px;height:450px;background:#06b6d433;right:-150px;top:0}
 .hero h1{font-size:clamp(3rem,10vw,6rem);line-height:1;font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
 .hero p{color:#94a3b8;margin-top:10px}
 
-.featured{max-width:1100px;margin:20px auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;backdrop-filter:blur(18px)}
+.featured,.footerbox{max-width:1100px;margin:20px auto;padding:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;backdrop-filter:blur(18px)}
+.featured{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
 .featured img{width:100%;max-width:320px;margin:auto;border-radius:20px;display:block}
-.featured .meta{display:flex;flex-direction:column;justify-content:center}
 
-.controls{position:sticky;top:10px;z-index:500;width:min(95%,1100px);margin:20px auto;padding:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;background:rgba(5,8,22,.8);backdrop-filter:blur(20px);border-radius:22px}
+.controls{
+position:relative;
+z-index:10;
+width:min(95%,1100px);
+margin:20px auto;
+padding:16px;
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+justify-content:center;
+background:rgba(5,8,22,.8);
+backdrop-filter:blur(20px);
+border-radius:22px;
+}
 input,select{padding:14px 18px;border:none;border-radius:16px;background:rgba(255,255,255,.08);color:white}
 
 .stats{max-width:1100px;margin:20px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
 .stat{background:rgba(255,255,255,.05);padding:18px;border-radius:20px;text-align:center}
 .stat b{display:block;font-size:2rem}
 
-.resultCount{text-align:center;color:#94a3b8}
 .grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
-
 .card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;overflow:hidden;transition:.3s}
-.card:hover{transform:translateY(-10px) scale(1.03);box-shadow:0 25px 50px rgba(0,0,0,.45)}
+.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 50px rgba(0,0,0,.45)}
 .card img{width:100%;display:block;cursor:pointer}
 .info{padding:16px}.number{color:#94a3b8}.name{font-size:1.1rem;font-weight:800}
-.type{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:700}
-.basic{background:#cbd5e1;color:#000}
-.rare{background:#60a5fa;color:#000}
-.secret{background:linear-gradient(90deg,#facc15,#fff3a3,#facc15);color:#000}
-.eternal{background:linear-gradient(90deg,#10b981,#6ee7b7,#10b981)}
-.dark{background:#111827;border:1px solid #374151}
-
-.secret-card{position:relative}
-.secret-card:after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 4s infinite;pointer-events:none}
-@keyframes shine{to{transform:translateX(120%)}}
-
-#emptyState{display:none;text-align:center;padding:30px;color:#94a3b8}
+.resultCount{text-align:center;color:#94a3b8;padding-bottom:10px}
+#emptyState{display:none;text-align:center;color:#94a3b8;padding:30px}
 
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);justify-content:center;align-items:center;padding:20px;z-index:9999}
-.modal-box{display:flex;gap:24px;flex-wrap:wrap;max-width:1100px}
 .modal img{max-width:420px;max-height:85vh;border-radius:20px}
-
-footer{max-width:1100px;margin:30px auto;padding:24px;text-align:center;color:#94a3b8}
 
 @media(max-width:768px){
 .controls{flex-direction:column}
 input,select{width:100%}
-.stats{grid-template-columns:repeat(2,1fr)}
-.featured{text-align:center}
 }
 </style>
 </head>
@@ -66,7 +62,10 @@ input,select{width:100%}
 <p>The Official Shaylen Trading Card Archive</p>
 </div>
 
-<div class="featured" id="featured"></div>
+<div class="featured">
+<div><img id="featuredImg"></div>
+<div><h2 id="featuredName"></h2><p id="featuredType"></p></div>
+</div>
 
 <div class="stats">
 <div class="stat"><b>17</b>Cards</div>
@@ -81,91 +80,59 @@ input,select{width:100%}
 <select id="typeFilter" onchange="filterCards()">
 <option value="all">All Types</option><option>Basic</option><option>Rare</option><option>Secret Rare</option><option>Eternal Legend</option><option>Dark</option>
 </select>
-<select id="sort" onchange="renderCards()">
-<option value="number">Sort: Number</option>
-<option value="name">Sort: Name</option>
-<option value="rarity">Sort: Rarity</option>
-</select>
 </div>
 
 <div class="resultCount" id="resultCount"></div>
-<div id="emptyState">No Shaylens found. Try another search.</div>
+<div id="emptyState">No Shaylens found.</div>
 <div class="grid" id="grid"></div>
 
-<div class="modal" id="modal">
-<div class="modal-box">
-<img id="modalImg">
-<div><h2 id="modalName"></h2><p id="modalMeta"></p></div>
-</div>
-</div>
+<div class="modal" id="modal"><img id="modalImg"></div>
 
-<footer>ShayDex • Collect • Discover • Archive</footer>
+<div class="footerbox">ShayDex • Collect • Discover • Archive</div>
 
 <script>
 const cards=[
 ['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],['4','Panda Shaylen','Rare'],
-['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],['7','Pickle Shaylen','Rare'],
+['5',"Cheesin\' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],['7','Pickle Shaylen','Rare'],
 ['8','Dragon Shaylen','Secret Rare'],['9','Bald Shaylen','Basic'],['10','Shuggie','Secret Rare'],
 ['11','Baby Shaylen','Basic'],['12','Christmas Shaylen','Eternal Legend'],['13','Devious Shaylen','Secret Rare'],
 ['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
 ];
 
-const featured=cards[Math.floor(Math.random()*cards.length)];
-document.getElementById('featured').innerHTML=`
-<div><img id="featuredImg" data-base="card_${featured[0]}"></div>
-<div class="meta"><div style="color:#94a3b8">FEATURED SHAYLEN</div><h2 style="font-size:clamp(2rem,5vw,3rem)">${featured[1]}</h2><p>${featured[2]}</p></div>`;
-
-function rarityRank(t){return {'Secret Rare':1,'Eternal Legend':2,'Dark':3,'Rare':4,'Basic':5}[t]||99}
-
-function loadSmart(img){
-const b=img.dataset.base;
+function loadSmart(img,b){
 const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
-let i=0;(function next(){if(i>=tries.length)return;img.onerror=()=>{i++;next()};img.src=tries[i]})();
+let i=0;(function n(){if(i>=tries.length)return;img.onerror=()=>{i++;n()};img.src=tries[i]})();
 }
 
-function renderCards(){
-const grid=document.getElementById('grid');
-let arr=[...cards];
-const sort=document.getElementById('sort').value;
-if(sort==='name')arr.sort((a,b)=>a[1].localeCompare(b[1]));
-if(sort==='rarity')arr.sort((a,b)=>rarityRank(a[2])-rarityRank(b[2]));
-grid.innerHTML='';
-arr.forEach(c=>{
-const badge=c[2]==='Basic'?'basic':c[2]==='Rare'?'rare':c[2]==='Secret Rare'?'secret':c[2]==='Dark'?'dark':'eternal';
-grid.innerHTML+=`<div class="card ${c[2]==='Secret Rare'?'secret-card':''}" data-type="${c[2]}">
-<img data-base="card_${c[0]}" data-name="${c[1]}" data-typex="${c[2]}" data-num="${c[0]}">
-<div class="info"><div class="number">#${String(c[0]).padStart(3,'0')}</div><div class="name">${c[1]}</div><div class="type ${badge}">${c[2]}</div></div></div>`;
-});
-document.querySelectorAll('img[data-base]').forEach(loadSmart);
-filterCards();
-}
+const f=cards[Math.floor(Math.random()*cards.length)];
+featuredName.innerText=f[1];
+featuredType.innerText=f[2];
+loadSmart(featuredImg,'card_'+f[0]);
+
+grid.innerHTML=cards.map(c=>`
+<div class="card" data-type="${c[2]}">
+<img data-base="card_${c[0]}">
+<div class="info"><div class="number">#${c[0].padStart ? c[0].padStart(3,'0'):c[0]}</div><div class="name">${c[1]}</div></div>
+</div>`).join('');
+
+document.querySelectorAll('[data-base]').forEach(i=>loadSmart(i,i.dataset.base));
 
 function filterCards(){
-const q=search.value.toLowerCase();
-const t=typeFilter.value;
+const q=search.value.toLowerCase(), t=typeFilter.value;
 let shown=0;
-document.querySelectorAll('.card').forEach(card=>{
-const ok=card.innerText.toLowerCase().includes(q)&&(t==='all'||card.dataset.type===t);
-card.style.display=ok?'':'none';
-if(ok) shown++;
+document.querySelectorAll('.card').forEach(c=>{
+const ok=c.innerText.toLowerCase().includes(q)&&(t==='all'||c.dataset.type===t);
+c.style.display=ok?'':'none'; if(ok) shown++;
 });
 resultCount.innerText=`Showing ${shown} of 17 cards`;
 emptyState.style.display=shown===0?'block':'none';
 }
+filterCards();
 
-renderCards();
-loadSmart(document.getElementById('featuredImg'));
-
-modal.onclick=()=>modal.style.display='none';
-document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.style.display='none';});
 document.addEventListener('click',e=>{
-if(e.target.matches('.card img')){
-modal.style.display='flex';
-modalImg.src=e.target.src;
-modalName.innerText=e.target.dataset.name;
-modalMeta.innerText='#'+String(e.target.dataset.num).padStart(3,'0')+' • '+e.target.dataset.typex;
-}
+if(e.target.matches('.card img')){modal.style.display='flex';modalImg.src=e.target.src;}
 });
+modal.onclick=()=>modal.style.display='none';
 </script>
 </body>
 </html>
