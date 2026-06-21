@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShayDex V7.1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:Inter,system-ui,sans-serif;
+background:linear-gradient(180deg,#0b1020,#1e1b4b);
+color:white;
+min-height:100vh;
+}
+header{padding:50px 20px 25px;text-align:center}
+h1{
+font-size:4rem;
+font-weight:900;
+background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);
+-webkit-background-clip:text;
+color:transparent;
+}
+.subtitle{color:#94a3b8;margin-top:8px}
+.search-wrap{padding:0 20px 30px;text-align:center}
+.count{color:#94a3b8;margin-bottom:12px}
+#search{
+width:100%;max-width:600px;
+padding:14px 20px;
+border-radius:999px;
+border:1px solid rgba(255,255,255,.15);
+background:rgba(255,255,255,.08);
+color:white;
+font-size:16px;
+}
+.grid{
+max-width:1500px;
+margin:auto;
+padding:20px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:22px;
+}
+.card{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.1);
+border-radius:24px;
+overflow:hidden;
+transition:.25s;
+backdrop-filter:blur(12px);
+}
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+.card img{width:100%;display:block;cursor:pointer}
+.info{padding:14px}
+.number{color:#94a3b8;font-size:.85rem}
+.name{font-weight:800;font-size:1.1rem;margin-top:4px}
+.modal{
+display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.95);
+justify-content:center;align-items:center;z-index:9999;
+}
+.modal img{max-width:95vw;max-height:95vh}
+footer{text-align:center;padding:30px;color:#64748b}
+</style>
+</head>
+<body>
+
+<header>
+<h1>SHAYDEX</h1>
+<p class="subtitle">Search and browse the complete Shaylen Trading Card Collection</p>
+</header>
+
+<div class="search-wrap">
+<div class="count">17 Cards</div>
+<input id="search" placeholder="Search cards or numbers..." onkeyup="searchCards()">
+</div>
+
+<div class="grid">
+
+<div class="card">
+<img src="card_1.jpeg">
+<div class="info">
+<div class="number">#001</div>
+<div class="name">Silly Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_2.jpeg">
+<div class="info">
+<div class="number">#002</div>
+<div class="name">Beaver Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_3.jpeg">
+<div class="info">
+<div class="number">#003</div>
+<div class="name">Sandy Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_4.jpeg">
+<div class="info">
+<div class="number">#004</div>
+<div class="name">Panda Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_5.jpeg">
+<div class="info">
+<div class="number">#005</div>
+<div class="name">Cheesin' Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_6.jpeg">
+<div class="info">
+<div class="number">#006</div>
+<div class="name">Princess Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_7.jpeg">
+<div class="info">
+<div class="number">#007</div>
+<div class="name">Pickle Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_8.jpeg">
+<div class="info">
+<div class="number">#008</div>
+<div class="name">Dragon Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_9.jpeg">
+<div class="info">
+<div class="number">#009</div>
+<div class="name">Bald Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_10.jpeg">
+<div class="info">
+<div class="number">#010</div>
+<div class="name">Shuggie</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_11.jpeg">
+<div class="info">
+<div class="number">#011</div>
+<div class="name">Baby Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_12.jpeg">
+<div class="info">
+<div class="number">#012</div>
+<div class="name">Christmas Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_13.jpeg">
+<div class="info">
+<div class="number">#013</div>
+<div class="name">Devious Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_14.jpeg">
+<div class="info">
+<div class="number">#014</div>
+<div class="name">Shocker Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_15.jpeg">
+<div class="info">
+<div class="number">#015</div>
+<div class="name">Evil Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_16.jpeg">
+<div class="info">
+<div class="number">#016</div>
+<div class="name">Innocent Shaylen</div>
+</div>
+</div>
+
+<div class="card">
+<img src="card_17.jpeg">
+<div class="info">
+<div class="number">#017</div>
+<div class="name">Hefty Shaylen</div>
+</div>
+</div>
+
+</div>
+
+<div class="modal" id="modal"><img id="modalImg"></div>
+
+<footer>ShayDex V7.1</footer>
+
+<script>
+function searchCards(){
+const q=document.getElementById('search').value.toLowerCase();
+document.querySelectorAll('.card').forEach(card=>{
+card.style.display=card.innerText.toLowerCase().includes(q)?'':'none';
+});
+}
+const modal=document.getElementById('modal');
+const modalImg=document.getElementById('modalImg');
+document.querySelectorAll('.card img').forEach(img=>{
+img.onclick=()=>{
+modal.style.display='flex';
+modalImg.src=img.src;
+};
+});
+modal.onclick=()=>modal.style.display='none';
+</script>
+
+</body>
+</html>
