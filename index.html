@@ -173,6 +173,18 @@ background:rgba(255,255,255,.08);color:white;
 <div class="progressBar"><div id="progressFill" class="progressFill"></div></div>
 </div>
 
+<div class="glass" style="padding:24px;margin:18px auto;">
+<h2>📸 Submit a Shaylen Card</h2>
+<p style="color:#94a3b8;margin:12px 0">
+Have an idea for a new Shaylen card? Submit it and it may become part of the official ShayDex collection.
+</p>
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog"
+target="_blank"
+style="display:inline-block;padding:12px 18px;background:#60a5fa;color:white;text-decoration:none;border-radius:14px;font-weight:700">
+Submit a Card Idea
+</a>
+</div>
+
 <div class="glass controls">
 
 <input id="search" placeholder="Search cards..." onkeyup="filterCards()">
@@ -374,6 +386,45 @@ setTimeout(()=>{
    updateEmpty();
  };
 },250);
+</script>
+
+
+<script>
+(function(){
+function fixFavorites(){
+  const counter=document.getElementById('favCounter');
+  const fill=document.getElementById('progressFill');
+  const text=document.getElementById('progressText');
+
+  function refresh(){
+    const stars=[...document.querySelectorAll('.favorite-btn')]
+      .filter(b=>b.innerHTML.includes('★')).length;
+
+    if(counter) counter.innerHTML='⭐ Favorites: '+stars;
+
+    const total=document.querySelectorAll('.card').length;
+
+    if(fill) fill.style.width=((stars/Math.max(total,1))*100)+'%';
+    if(text) text.textContent=stars+' / '+total;
+
+    document.querySelectorAll('.card').forEach(card=>{
+      if(!card.classList.contains('favorite-glow')){
+        card.style.transform='perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
+      }
+    });
+  }
+
+  document.addEventListener('click',e=>{
+    if(e.target.classList.contains('favorite-btn')){
+      setTimeout(refresh,20);
+    }
+  });
+
+  refresh();
+}
+
+setTimeout(fixFavorites,500);
+})();
 </script>
 
 </body>
