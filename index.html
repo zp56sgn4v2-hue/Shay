@@ -1,166 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShayDex Launch V2.1</title>
+<title>ShayDex Launch V3</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-font-family:Inter,system-ui,sans-serif;
-background:#050816;
-color:white;
-overflow-x:hidden;
-}
-body:before,body:after{
-content:'';position:fixed;border-radius:50%;
-filter:blur(120px);z-index:-1;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#050816,#0f172a);color:#fff;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(120px);z-index:-1}
 body:before{width:500px;height:500px;background:#7c3aed33;left:-150px;top:-100px}
 body:after{width:450px;height:450px;background:#06b6d433;right:-150px;top:0}
 
-.hero{
-padding:50px 20px 30px;
-text-align:center;
-max-width:1100px;
-margin:auto;
-}
-.hero h1{
-font-size:clamp(3rem,10vw,6rem);
-line-height:1;
-font-weight:900;
-background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);
--webkit-background-clip:text;
-color:transparent;
-}
+.hero{max-width:1100px;margin:auto;text-align:center;padding:50px 20px 20px}
+.hero h1{font-size:clamp(3rem,10vw,6rem);line-height:1;font-weight:900;background:linear-gradient(90deg,#facc15,#f472b6,#60a5fa);-webkit-background-clip:text;color:transparent}
 .hero p{color:#94a3b8;margin-top:10px}
 
-.featured{
-max-width:1100px;
-margin:20px auto;
-padding:30px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:30px;
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.08);
-border-radius:32px;
-}
-.featured img{
-width:100%;
-max-width:320px;
-height:auto;
-display:block;
-margin:auto;
-border-radius:20px;
-}
+.featured{max-width:1100px;margin:20px auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;backdrop-filter:blur(18px)}
+.featured img{width:100%;max-width:320px;margin:auto;border-radius:20px;display:block}
+.featured .meta{display:flex;flex-direction:column;justify-content:center}
 
-.stats{
-max-width:1100px;
-margin:20px auto;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:15px;
-padding:0 20px;
-}
-.stat{
-background:rgba(255,255,255,.05);
-padding:20px;
-border-radius:20px;
-text-align:center;
-}
+.controls{position:sticky;top:10px;z-index:500;width:min(95%,1100px);margin:20px auto;padding:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;background:rgba(5,8,22,.8);backdrop-filter:blur(20px);border-radius:22px}
+input,select{padding:14px 18px;border:none;border-radius:16px;background:rgba(255,255,255,.08);color:white}
+
+.stats{max-width:1100px;margin:20px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.stat{background:rgba(255,255,255,.05);padding:18px;border-radius:20px;text-align:center}
 .stat b{display:block;font-size:2rem}
 
-.controls{
-position:sticky;
-top:10px;
-z-index:500;
-width:min(95%,1100px);
-margin:20px auto;
-padding:16px;
-display:flex;
-gap:12px;
-justify-content:center;
-flex-wrap:wrap;
-background:rgba(5,8,22,.85);
-backdrop-filter:blur(20px);
-border-radius:24px;
-}
-input,select{
-padding:14px 18px;
-border:none;
-border-radius:16px;
-background:rgba(255,255,255,.08);
-color:white;
-}
+.resultCount{text-align:center;color:#94a3b8}
+.grid{max-width:1700px;margin:auto;padding:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
 
-.grid{
-max-width:1700px;
-margin:auto;
-padding:25px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:24px;
-}
-.card{
-background:rgba(255,255,255,.05);
-border-radius:28px;
-overflow:hidden;
-transition:.3s;
-}
-.card:hover{
-transform:translateY(-8px) scale(1.02);
-}
-.card img{width:100%;display:block}
-.info{padding:16px}
-.number{color:#94a3b8}
-.name{font-weight:800}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:28px;overflow:hidden;transition:.3s}
+.card:hover{transform:translateY(-10px) scale(1.03);box-shadow:0 25px 50px rgba(0,0,0,.45)}
+.card img{width:100%;display:block;cursor:pointer}
+.info{padding:16px}.number{color:#94a3b8}.name{font-size:1.1rem;font-weight:800}
+.type{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:700}
+.basic{background:#cbd5e1;color:#000}
+.rare{background:#60a5fa;color:#000}
+.secret{background:linear-gradient(90deg,#facc15,#fff3a3,#facc15);color:#000}
+.eternal{background:linear-gradient(90deg,#10b981,#6ee7b7,#10b981)}
+.dark{background:#111827;border:1px solid #374151}
 
-footer{
-max-width:1100px;
-margin:30px auto;
-padding:20px;
-text-align:center;
-color:#94a3b8;
-}
+.secret-card{position:relative}
+.secret-card:after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 4s infinite;pointer-events:none}
+@keyframes shine{to{transform:translateX(120%)}}
 
-@media (max-width:768px){
-.featured{
-grid-template-columns:1fr;
-text-align:center;
-}
-.featured h2{
-font-size:2rem!important;
-}
-.stats{
-grid-template-columns:repeat(2,1fr);
-}
-.controls{
-flex-direction:column;
-}
-input,select{
-width:100%;
-}
+#emptyState{display:none;text-align:center;padding:30px;color:#94a3b8}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(20px);justify-content:center;align-items:center;padding:20px;z-index:9999}
+.modal-box{display:flex;gap:24px;flex-wrap:wrap;max-width:1100px}
+.modal img{max-width:420px;max-height:85vh;border-radius:20px}
+
+footer{max-width:1100px;margin:30px auto;padding:24px;text-align:center;color:#94a3b8}
+
+@media(max-width:768px){
+.controls{flex-direction:column}
+input,select{width:100%}
+.stats{grid-template-columns:repeat(2,1fr)}
+.featured{text-align:center}
 }
 </style>
 </head>
 <body>
-
 <div class="hero">
 <h1>SHAYDEX</h1>
 <p>The Official Shaylen Trading Card Archive</p>
 </div>
 
-<div class="featured">
-<div style="text-align:center">
-<img src="card_8.PNG" onerror="this.src='card_8.png'">
-</div>
-<div style="display:flex;flex-direction:column;justify-content:center">
-<div style="color:#94a3b8">FEATURED SHAYLEN</div>
-<h2 style="font-size:3rem">Dragon Shaylen</h2>
-<p>Secret Rare</p>
-</div>
-</div>
+<div class="featured" id="featured"></div>
 
 <div class="stats">
 <div class="stat"><b>17</b>Cards</div>
@@ -171,11 +77,95 @@ width:100%;
 </div>
 
 <div class="controls">
-<input placeholder="Search cards...">
-<select><option>All Types</option></select>
+<input id="search" placeholder="Search cards..." onkeyup="filterCards()">
+<select id="typeFilter" onchange="filterCards()">
+<option value="all">All Types</option><option>Basic</option><option>Rare</option><option>Secret Rare</option><option>Eternal Legend</option><option>Dark</option>
+</select>
+<select id="sort" onchange="renderCards()">
+<option value="number">Sort: Number</option>
+<option value="name">Sort: Name</option>
+<option value="rarity">Sort: Rarity</option>
+</select>
 </div>
 
-<footer>ShayDex Archive • Launch V2.1 Layout Fix</footer>
+<div class="resultCount" id="resultCount"></div>
+<div id="emptyState">No Shaylens found. Try another search.</div>
+<div class="grid" id="grid"></div>
 
+<div class="modal" id="modal">
+<div class="modal-box">
+<img id="modalImg">
+<div><h2 id="modalName"></h2><p id="modalMeta"></p></div>
+</div>
+</div>
+
+<footer>ShayDex • Collect • Discover • Archive</footer>
+
+<script>
+const cards=[
+['1','Silly Shaylen','Basic'],['2','Beaver Shaylen','Rare'],['3','Sandy Shaylen','Rare'],['4','Panda Shaylen','Rare'],
+['5',"Cheesin' Shaylen",'Rare'],['6','Princess Shaylen','Secret Rare'],['7','Pickle Shaylen','Rare'],
+['8','Dragon Shaylen','Secret Rare'],['9','Bald Shaylen','Basic'],['10','Shuggie','Secret Rare'],
+['11','Baby Shaylen','Basic'],['12','Christmas Shaylen','Eternal Legend'],['13','Devious Shaylen','Secret Rare'],
+['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic']
+];
+
+const featured=cards[Math.floor(Math.random()*cards.length)];
+document.getElementById('featured').innerHTML=`
+<div><img id="featuredImg" data-base="card_${featured[0]}"></div>
+<div class="meta"><div style="color:#94a3b8">FEATURED SHAYLEN</div><h2 style="font-size:clamp(2rem,5vw,3rem)">${featured[1]}</h2><p>${featured[2]}</p></div>`;
+
+function rarityRank(t){return {'Secret Rare':1,'Eternal Legend':2,'Dark':3,'Rare':4,'Basic':5}[t]||99}
+
+function loadSmart(img){
+const b=img.dataset.base;
+const tries=[b+'.jpeg',b+'.JPEG',b+'.jpg',b+'.JPG',b+'.png',b+'.PNG',b+'.webp',b+'.WEBP'];
+let i=0;(function next(){if(i>=tries.length)return;img.onerror=()=>{i++;next()};img.src=tries[i]})();
+}
+
+function renderCards(){
+const grid=document.getElementById('grid');
+let arr=[...cards];
+const sort=document.getElementById('sort').value;
+if(sort==='name')arr.sort((a,b)=>a[1].localeCompare(b[1]));
+if(sort==='rarity')arr.sort((a,b)=>rarityRank(a[2])-rarityRank(b[2]));
+grid.innerHTML='';
+arr.forEach(c=>{
+const badge=c[2]==='Basic'?'basic':c[2]==='Rare'?'rare':c[2]==='Secret Rare'?'secret':c[2]==='Dark'?'dark':'eternal';
+grid.innerHTML+=`<div class="card ${c[2]==='Secret Rare'?'secret-card':''}" data-type="${c[2]}">
+<img data-base="card_${c[0]}" data-name="${c[1]}" data-typex="${c[2]}" data-num="${c[0]}">
+<div class="info"><div class="number">#${String(c[0]).padStart(3,'0')}</div><div class="name">${c[1]}</div><div class="type ${badge}">${c[2]}</div></div></div>`;
+});
+document.querySelectorAll('img[data-base]').forEach(loadSmart);
+filterCards();
+}
+
+function filterCards(){
+const q=search.value.toLowerCase();
+const t=typeFilter.value;
+let shown=0;
+document.querySelectorAll('.card').forEach(card=>{
+const ok=card.innerText.toLowerCase().includes(q)&&(t==='all'||card.dataset.type===t);
+card.style.display=ok?'':'none';
+if(ok) shown++;
+});
+resultCount.innerText=`Showing ${shown} of 17 cards`;
+emptyState.style.display=shown===0?'block':'none';
+}
+
+renderCards();
+loadSmart(document.getElementById('featuredImg'));
+
+modal.onclick=()=>modal.style.display='none';
+document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.style.display='none';});
+document.addEventListener('click',e=>{
+if(e.target.matches('.card img')){
+modal.style.display='flex';
+modalImg.src=e.target.src;
+modalName.innerText=e.target.dataset.name;
+modalMeta.innerText='#'+String(e.target.dataset.num).padStart(3,'0')+' • '+e.target.dataset.typex;
+}
+});
+</script>
 </body>
 </html>
