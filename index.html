@@ -543,35 +543,16 @@ let currentLightboxIndex = -1;
 const imgCache = {};
 function loadSmart(img, base) {
   if (imgCache[base]) { img.src = imgCache[base]; return; }
-
-  const tries = [
-    base+'.jpeg', base+'.JPEG',
-    base+'.jpg',  base+'.JPG',
-    base+'.png',  base+'.PNG',
-    base+'.webp', base+'.WEBP'
-  ];
-
+  const tries = [base+'.jpg', base+'.jpeg', base+'.png', base+'.webp'];
   let i = 0;
-
   function tryNext() {
     if (i >= tries.length) return;
-
     const src = tries[i];
     const probe = new Image();
-
-    probe.onload = () => {
-      imgCache[base] = src;
-      img.src = src;
-    };
-
-    probe.onerror = () => {
-      i++;
-      tryNext();
-    };
-
+    probe.onload = () => { imgCache[base] = src; img.src = src; };
+    probe.onerror = () => { i++; tryNext(); };
     probe.src = src;
   }
-
   tryNext();
 }
 
@@ -582,13 +563,16 @@ function renderNewDrops() {
   
   const unrevealed = cards.filter(c => MYSTERY_IDS.has(c[0]));
   
+  if (unrevealed.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
   section.style.display = '';
   
   container.innerHTML = unrevealed.map(c => {
     const id = c[0];
-    const flipped = revealed.has(id) ? "flipped" : "";
     return `
-      <div class="flip-card ${flipped} pulse" data-id="${id}">
+      <div class="flip-card ${revealed.has(id)?`flipped`:``} pulse" data-id="${id}">
         <div class="flip-card-inner">
           <div class="flip-card-front">
             <div class="logo">S</div>
@@ -775,8 +759,6 @@ document.getElementById('shareBtn').onclick = async () => {
 };
 
 /* ---------- Init with lightbox listeners ---------- */
-window.openLightbox = openLightbox;
-
 function init() {
   document.getElementById('headerCount').textContent = `${cards.length} cards`;
   
