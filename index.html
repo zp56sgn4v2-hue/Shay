@@ -541,12 +541,15 @@ function loadSmart(img,base){
   }
   const tries=[base+'.jpeg',base+'.jpg',base+'.webp',base+'.png'];
   let i=0;
-  (function next(){
+  function attempt(){
     if(i>=tries.length)return;
-    img.onerror=()=>{i++;next();};
-    img.addEventListener('load',()=>{_imgCache[base]=img.src;reveal();},{once:true});
-    img.src=tries[i];
-  })();
+    const src=tries[i];
+    const probe=new Image();
+    probe.onload=()=>{_imgCache[base]=src;img.src=src;reveal();};
+    probe.onerror=()=>{i++;attempt();};
+    probe.src=src;
+  }
+  attempt();
 }
 
 /* ---------- toast ---------- */
