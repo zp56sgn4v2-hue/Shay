@@ -113,14 +113,24 @@ header {
   text-transform: uppercase;
 }
 .drops-strip {
-  display: flex;
-  gap: 18px;
-  overflow-x: auto;
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  justify-content:center;
   padding-bottom: 10px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 .drops-strip::-webkit-scrollbar { display: none; }
+
+.reveal-card{
+ animation: revealFade .8s ease;
+}
+@keyframes revealFade{
+ 0%{opacity:.2;transform:scale(.92)}
+ 60%{opacity:1;transform:scale(1.04)}
+ 100%{opacity:1;transform:scale(1)}
+}
 
 .flip-card {
   flex: 0 0 162px;
@@ -449,29 +459,6 @@ header {
   color: #555;
   letter-spacing: .6px;
 }
-
-/* V3.6 Mystery Overhaul */
-.flip-card{cursor:pointer}
-.flip-card-inner{transition:opacity .45s ease, transform .45s ease !important}
-.flip-card.revealed .flip-card-inner{transform:none !important}
-.reveal-glow{
-  animation:revealGlow 1s ease;
-}
-@keyframes revealGlow{
-  0%{filter:brightness(1)}
-  50%{filter:brightness(1.6) drop-shadow(0 0 20px gold)}
-  100%{filter:brightness(1)}
-}
-.discovery-pill{
-  display:inline-block;
-  margin-bottom:12px;
-  padding:6px 12px;
-  border-radius:999px;
-  background:rgba(245,200,66,.12);
-  color:#f5c842;
-  font-size:.8rem;
-}
-
 </style>
 </head>
 <body>
@@ -492,7 +479,7 @@ header {
 
 <!-- New Drops -->
 <section class="new-drops" id="newDropsSection">
-  <h2>New Drops</h2><div id="discoveryTracker" class="discovery-pill"></div>
+  <h2>New Drops</h2>
   <div class="drops-strip" id="dropsStrip"></div>
 </section>
 
@@ -566,35 +553,16 @@ let currentLightboxIndex = -1;
 const imgCache = {};
 function loadSmart(img, base) {
   if (imgCache[base]) { img.src = imgCache[base]; return; }
-
-  const tries = [
-    base+'.jpeg', base+'.JPEG',
-    base+'.jpg',  base+'.JPG',
-    base+'.png',  base+'.PNG',
-    base+'.webp', base+'.WEBP'
-  ];
-
+  const tries = [base+'.jpg', base+'.jpeg', base+'.png', base+'.webp'];
   let i = 0;
-
   function tryNext() {
     if (i >= tries.length) return;
-
     const src = tries[i];
     const probe = new Image();
-
-    probe.onload = () => {
-      imgCache[base] = src;
-      img.src = src;
-    };
-
-    probe.onerror = () => {
-      i++;
-      tryNext();
-    };
-
+    probe.onload = () => { imgCache[base] = src; img.src = src; };
+    probe.onerror = () => { i++; tryNext(); };
     probe.src = src;
   }
-
   tryNext();
 }
 
@@ -609,16 +577,17 @@ function renderNewDrops() {
   
   container.innerHTML = unrevealed.map(c => {
     const id = c[0];
-    const flipped = revealed.has(id) ? "flipped" : "";
-    return `
-      <div class="flip-card ${flipped} pulse" data-id="${id}">
-        <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <div class="logo">S</div>
-          </div>
-          <div class="flip-card-back">
-            <img data-base="card_${id}" alt="${c[1]}">
-          </div>
+    const isRevealed = revealed.has(id);
+    return isRevealed ? `
+      <div class="flip-card reveal-card" data-id="${id}">
+        <div class="flip-card-back" style="position:relative;transform:none">
+          <img data-base="card_${id}" alt="${c[1]}">
+        </div>
+      </div>
+    ` : `
+      <div class="flip-card pulse" data-id="${id}">
+        <div class="flip-card-front">
+          <div class="logo" style="font-size:1.3rem;letter-spacing:2px">SHAYDEX</div>
         </div>
       </div>
     `;
@@ -631,15 +600,12 @@ function renderNewDrops() {
 
     cardEl.addEventListener('click', () => {
       if (revealed.has(id)) return;
-      cardEl.classList.add('flipped');
-      
+      revealed.add(id);
+      localStorage.setItem(REVEAL_KEY, JSON.stringify([...revealed]));
+      renderGallery();
+      renderNewDrops();
+
       setTimeout(() => {
-        revealed.add(id);
-        localStorage.setItem(REVEAL_KEY, JSON.stringify([...revealed]));
-        renderGallery(); updateDiscoveryTracker();
-        renderNewDrops(); updateDiscoveryTracker();
-        
-        setTimeout(() => {
           const idx = cards.findIndex(c => c[0] === id);
           if (idx !== -1) openLightbox(idx);
         }, 380);
@@ -704,7 +670,7 @@ function renderGallery() {
       e.stopPropagation();
       if (favs.has(id)) favs.delete(id); else favs.add(id);
       localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
-      renderGallery(); updateDiscoveryTracker();
+      renderGallery();
     });
   });
 }
@@ -782,7 +748,7 @@ const collectionBtn = document.getElementById('collectionBtn');
 collectionBtn.onclick = () => {
   showCollection = !showCollection;
   collectionBtn.classList.toggle('active', showCollection);
-  renderGallery(); updateDiscoveryTracker();
+  renderGallery();
 };
 
 /* ---------- Share ---------- */
@@ -798,13 +764,11 @@ document.getElementById('shareBtn').onclick = async () => {
 };
 
 /* ---------- Init with lightbox listeners ---------- */
-window.openLightbox = openLightbox;
-
 function init() {
   document.getElementById('headerCount').textContent = `${cards.length} cards`;
   
-  renderNewDrops(); updateDiscoveryTracker();
-  renderGallery(); updateDiscoveryTracker();
+  renderNewDrops();
+  renderGallery();
   
   // Lightbox event listeners
   document.getElementById('lightboxClose').onclick = closeLightbox;
