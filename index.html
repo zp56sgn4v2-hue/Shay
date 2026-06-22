@@ -2,112 +2,963 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHAYDEX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ShayDex — The Gallery</title>
+<meta name="description" content="The official Shaylen trading card archive. A clean gallery of every Shaylen card.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="ShayDex — The Gallery">
+<meta property="og:description" content="The official Shaylen trading card archive. A clean gallery of every Shaylen card.">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ShayDex — The Gallery">
+<meta name="twitter:description" content="The official Shaylen trading card archive. A clean gallery of every Shaylen card.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="theme-color" content="#0a0a0a">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&amp;family=Inter:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-
-body{
-background:#020202;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-color:white;
+:root {
+  --bg: #0a0a0a;
+  --accent: #f5c842;
+  --text: #f8f8f8;
+  --text-dim: #888888;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --overlay: rgba(10,10,10,0.92);
+  --r: 14px;
+  --font: 'Space Grotesk', system-ui, -apple-system, sans-serif;
 }
 
-body:before{
-content:"";
-position:absolute;
-inset:0;
-background:
-radial-gradient(circle at center,
-rgba(255,190,60,.12) 0%,
-rgba(255,190,60,.03) 25%,
-transparent 60%);
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-.container{
-position:relative;
-z-index:2;
-text-align:center;
-padding:20px;
+/* Slim Editorial Header */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid #222;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.logo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -.025em;
+  color: var(--accent);
+}
+.card-count {
+  font-size: .82rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all .15s ease;
+}
+.icon-btn:hover {
+  background: #1a1a1a;
+  color: var(--accent);
+}
+.icon-btn.active {
+  color: var(--accent);
 }
 
-.logo{
-font-size:clamp(3.5rem,10vw,6rem);
-font-weight:900;
-letter-spacing:-2px;
-background:linear-gradient(180deg,#ffd86b,#d9a73b,#f6d37a);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-text-shadow:0 0 30px rgba(255,210,100,.18);
+/* New Drops Strip */
+.new-drops {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid #222;
+}
+.new-drops h2 {
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.drops-strip {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.drops-strip::-webkit-scrollbar { display: none; }
+
+.drop-card {
+  flex: 0 0 150px;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+.drop-img-wrap {
+  position: relative;
+  width: 150px;
+  height: 210px;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease;
+}
+.drop-card:hover .drop-img-wrap {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 44px rgba(0,0,0,.65);
+}
+.drop-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.drop-new-badge {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  background: var(--accent);
+  color: #000;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.drop-label {
+  padding: 9px 2px 0;
+}
+.drop-name {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drop-rarity {
+  font-size: .7rem;
+  margin-top: 2px;
+  font-weight: 400;
 }
 
-.subtitle{
-margin-top:10px;
-font-size:.8rem;
-letter-spacing:6px;
-color:rgba(255,255,255,.45);
+/* Main Gallery */
+.gallery-header {
+  padding: 28px 24px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.gallery-header h2 {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.gallery-header .count {
+  font-size: .88rem;
+  color: var(--text-dim);
 }
 
-.line{
-width:220px;
-height:1px;
-margin:40px auto;
-background:linear-gradient(90deg,transparent,#d9a73b,transparent);
+.grid {
+  padding: 0 24px 70px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
+  gap: 14px;
+}
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); } }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(auto-fill, minmax(188px, 1fr)); } }
+@media (min-width: 1200px) { .grid { grid-template-columns: repeat(auto-fill, minmax(198px, 1fr)); } }
+
+.card {
+  position: relative;
+  aspect-ratio: 5 / 7;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #111;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 6px 22px rgba(0,0,0,.45);
+  transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 22px 50px rgba(0,0,0,.6);
+  }
+  .card:hover img {
+    transform: scale(1.018);
+  }
+  .card .info {
+    transform: translateY(100%);
+  }
+  .card:hover .info {
+    transform: translateY(0);
+  }
 }
 
-.date{
-font-size:clamp(1.8rem,5vw,3rem);
-font-weight:700;
-letter-spacing:10px;
-color:#f3d37b;
-animation:pulse 4s ease-in-out infinite;
+/* Always show info on touch devices */
+@media (hover: none) {
+  .card .info {
+    transform: translateY(0);
+    background: linear-gradient(transparent, rgba(10,10,10,0.88) 30%);
+  }
+  .card .fav {
+    opacity: 0.9;
+  }
 }
 
-.time{
-margin-top:18px;
-font-size:clamp(1.1rem,2vw,1.5rem);
-letter-spacing:8px;
-color:rgba(255,255,255,.85);
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .55s ease;
 }
 
-.footer{
-position:absolute;
-bottom:40px;
-left:0;
-right:0;
-text-align:center;
-font-size:.75rem;
-letter-spacing:5px;
-color:rgba(255,255,255,.18);
+/* Hover info overlay */
+.card .info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 15px 14px;
+  background: linear-gradient(transparent, rgba(10,10,10,0.92) 38%);
+  transition: transform .22s cubic-bezier(.23,1,.32,1);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.card .info strong {
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.card .info .rarity {
+  font-size: .7rem;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: .6px;
 }
 
-@keyframes pulse{
-0%,100%{
-opacity:.65;
-text-shadow:0 0 8px rgba(255,210,100,.2);
+/* Favorite heart */
+.card .fav {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0,0,0,.7);
+  color: #fff;
+  font-size: 1.05rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all .2s ease;
+  z-index: 2;
+  cursor: pointer;
 }
-50%{
-opacity:1;
-text-shadow:
-0 0 15px rgba(255,210,100,.5),
-0 0 35px rgba(255,210,100,.25);
+@media (hover: none) {
+  .card .fav { opacity: 0.85; }
 }
+.card:hover .fav,
+.card .fav.favorited {
+  opacity: 1;
+}
+.card .fav.favorited {
+  color: #e03535;
+}
+
+/* Search Overlay */
+#searchOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(22px);
+  z-index: 200;
+  display: none;
+  align-items: flex-start;
+  padding-top: 90px;
+}
+#searchOverlay.open { display: flex; }
+.search-inner {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+#searchInput {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  color: var(--text);
+  font-size: 1.3rem;
+  padding: 18px 24px;
+  border-radius: 999px;
+  outline: none;
+  font-family: inherit;
+}
+#searchInput::placeholder { color: #555; }
+#searchResults {
+  margin-top: 20px;
+  max-height: 58vh;
+  overflow-y: auto;
+}
+
+/* Fullscreen Lightbox */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.96);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+}
+#lightbox.open { display: flex; }
+.lightbox-content {
+  max-width: 880px;
+  width: 100%;
+  text-align: center;
+}
+.lightbox-content img {
+  max-height: 70vh;
+  max-width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 35px 90px rgba(0,0,0,.75);
+  margin-bottom: 22px;
+}
+.lightbox-info {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+.lightbox-info .rarity {
+  color: var(--accent);
+  font-size: .92rem;
+  margin-top: 5px;
+}
+.lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 1.7rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s ease;
+  z-index: 10;
+}
+.lightbox-nav:hover { background: #222; border-color: var(--accent); }
+.lightbox-nav.prev { left: 22px; }
+.lightbox-nav.next { right: 22px; }
+#lightboxClose {
+  position: fixed;
+  top: 26px;
+  right: 26px;
+  width: 46px;
+  height: 46px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 1.5rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+}
+
+/* Rarity filter */
+.rarity-filter {
+  padding: 0 24px 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rarity-pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 500;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: .02em;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.rarity-pill:hover { border-color: #444; color: var(--text); }
+.rarity-pill.active { background: #1e1e1e; border-color: var(--accent); color: var(--accent); }
+
+/* Lightbox action buttons */
+.lightbox-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+.lb-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #111;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .18s, color .18s;
+  text-decoration: none;
+}
+.lb-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 70px 20px;
+  color: var(--text-dim);
+  font-size: 1rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 50px 20px 40px;
+  font-size: .78rem;
+  color: #555;
+  letter-spacing: .6px;
+}
+.footer-suggest {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-top: 1px solid #1e1e1e;
+  padding-top: 40px;
+}
+.footer-suggest-text {
+  font-size: .82rem;
+  color: #555;
+  margin-bottom: 14px;
+  letter-spacing: .03em;
+}
+.footer-suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color .18s, color .18s;
+}
+.footer-suggest-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.footer-credit {
+  color: #444;
+  font-size: .75rem;
+  letter-spacing: .08em;
 }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="logo">SHAYDEX</div>
-<div class="subtitle">UNDER CONSTRUCTION</div>
-<div class="line"></div>
-<div class="date">06 • 22 • 26</div>
-<div class="time">6:00 P.M.</div>
+
+<!-- Slim Header -->
+<header>
+  <div class="header-left">
+    <div class="logo">SHAYDEX</div>
+    <div class="card-count" id="headerCount">V III</div>
+  </div>
+  
+  <div class="header-actions">
+    <button class="icon-btn" id="searchBtn" aria-label="Search">🔍</button>
+    <button class="icon-btn" id="collectionBtn" aria-label="Toggle collection">♡</button>
+    <button class="icon-btn" id="shareBtn" aria-label="Share">↗</button>
+  </div>
+</header>
+
+<!-- New Drops -->
+<section class="new-drops" id="newDropsSection">
+  <h2>New Drops</h2>
+  <div class="drops-strip" id="dropsStrip"></div>
+</section>
+
+<!-- Main Gallery -->
+<section>
+  <div class="gallery-header">
+    <h2 id="galleryTitle">The Collection</h2>
+    <div class="count" id="galleryCount"></div>
+  </div>
+  
+  <div class="rarity-filter" id="rarityFilter">
+    <button class="rarity-pill active" data-rarity="all">All</button>
+    <button class="rarity-pill" data-rarity="Basic">Basic</button>
+    <button class="rarity-pill" data-rarity="Rare">Rare</button>
+    <button class="rarity-pill" data-rarity="Secret Rare">Secret Rare</button>
+    <button class="rarity-pill" data-rarity="Eternal Legend">Eternal Legend</button>
+    <button class="rarity-pill" data-rarity="Dark">Dark</button>
+  </div>
+  <div id="grid" class="grid"></div>
+  
+  <div id="emptyState" class="empty" hidden>
+    No cards in your collection yet.<br>
+    Tap the heart on any card to save it.
+  </div>
+</section>
+
+<div class="footer">
+  <div class="footer-suggest">
+    <div class="footer-suggest-text">Got an idea for a new Shaylen card?</div>
+    <a class="footer-suggest-btn"
+       href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog"
+       target="_blank" rel="noopener noreferrer">
+      ✦ Suggest a card
+    </a>
+  </div>
+  <div class="footer-credit">ShayDex V III &nbsp;&middot;&nbsp; Made by Bro Co.</div>
 </div>
-<div class="footer">SOMETHING IS COMING.</div>
+
+<!-- Search Overlay -->
+<div id="searchOverlay">
+  <div class="search-inner">
+    <input type="text" id="searchInput" placeholder="Search cards by name or rarity…" autocomplete="off">
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button id="lightboxClose">✕</button>
+  <button class="lightbox-nav prev" id="lbPrev">‹</button>
+  <div class="lightbox-content">
+    <img id="lbImg" alt="">
+    <div class="lightbox-info">
+      <div id="lbName"></div>
+      <div class="rarity" id="lbRarity"></div>
+    </div>
+    <div class="lightbox-actions">
+      <button class="lb-action-btn" id="lbDownload">↓ Download</button>
+      <button class="lb-action-btn" id="lbShareCard">↗ Share</button>
+    </div>
+  </div>
+  <button class="lightbox-nav next" id="lbNext">›</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const cards = [
+  ['1','Silly Shaylen','Basic'],
+  ['2','Beaver Shaylen','Rare'],
+  ['3','Sandy Shaylen','Rare'],
+  ['4','Panda Shaylen','Rare'],
+  ['5',"Cheesin' Shaylen",'Rare'],
+  ['6','Princess Shaylen','Secret Rare'],
+  ['7','Pickle Shaylen','Rare'],
+  ['8','Dragon Shaylen','Secret Rare'],
+  ['9','Bald Shaylen','Basic'],
+  ['10','Shuggie','Secret Rare'],
+  ['11','Baby Shaylen','Basic'],
+  ['12','Christmas Shaylen','Eternal Legend'],
+  ['13','Devious Shaylen','Secret Rare'],
+  ['14','Shocker Shaylen','Basic'],
+  ['15','Evil Shaylen','Dark'],
+  ['16','Innocent Shaylen','Basic'],
+  ['17','Hefty Shaylen','Basic'],
+  ['18','Groovin’ Shaylen','Basic'],
+  ['19','Hungry Shaylen','Rare'],
+  ['20','Hangry Shaylen','Basic'],
+  ['21','Sunburnt Shaylen','Basic'],
+  ['22','Nature Shaylen','Rare'],
+  ['23','Shaylen And The Bros','Basic'],
+  ['24','Bizarre Shaylen','Basic'],
+  ['25','Grafiti Shaylen','Basic']
+].sort((a,b) => Number(b[0]) - Number(a[0]));
+
+const MYSTERY_IDS = new Set(['23','24','25']);
+const RARITY_COLOR = {Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Dark:'#f87171'};
+
+const FAV_KEY = 'shaydexFavorites_v3';
+const REVEAL_KEY = 'shaydexRevealed_v3';
+let favs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+let revealed = new Set(JSON.parse(localStorage.getItem(REVEAL_KEY) || '[]'));
+
+let showCollection = false;
+let activeRarity = 'all';
+let currentLightboxIndex = -1;
+
+/* ---------- Image loader ---------- */
+const imgCache = {};
+function loadSmart(img, base) {
+  if (imgCache[base]) { img.src = imgCache[base]; return; }
+
+  const tries = [
+    base+'.jpeg', base+'.JPEG',
+    base+'.jpg',  base+'.JPG',
+    base+'.png',  base+'.PNG',
+    base+'.webp', base+'.WEBP'
+  ];
+
+  let i = 0;
+
+  function tryNext() {
+    if (i >= tries.length) return;
+
+    const src = tries[i];
+    const probe = new Image();
+
+    probe.onload = () => {
+      imgCache[base] = src;
+      img.src = src;
+    };
+
+    probe.onerror = () => {
+      i++;
+      tryNext();
+    };
+
+    probe.src = src;
+  }
+
+  tryNext();
+}
+
+/* ---------- Render New Drops ---------- */
+function renderNewDrops() {
+  const container = document.getElementById('dropsStrip');
+  const section = document.getElementById('newDropsSection');
+  const newCards = cards.filter(c => MYSTERY_IDS.has(c[0]));
+
+  if (!newCards.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  container.innerHTML = newCards.map(c => {
+    const id = c[0], name = c[1], rarity = c[2];
+    return `<div class="drop-card" data-id="${id}">
+      <div class="drop-img-wrap">
+        <img data-base="card_${id}" alt="${name}" decoding="async">
+        <span class="drop-new-badge">NEW</span>
+      </div>
+      <div class="drop-label">
+        <div class="drop-name">${name}</div>
+        <div class="drop-rarity" style="color:${RARITY_COLOR[rarity]}">${rarity}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+
+  container.querySelectorAll('.drop-card').forEach(cardEl => {
+    const id = cardEl.dataset.id;
+    cardEl.addEventListener('click', () => {
+      const idx = cards.findIndex(c => c[0] === id);
+      if (idx !== -1) openLightbox(idx);
+    });
+  });
+}
+
+/* ---------- Render Main Gallery ---------- */
+function renderGallery() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('emptyState');
+  const title = document.getElementById('galleryTitle');
+  const countEl = document.getElementById('galleryCount');
+
+  let visibleCards = cards.filter(c => {
+    if (showCollection && !favs.has(c[0])) return false;
+    if (activeRarity !== 'all' && c[2] !== activeRarity) return false;
+    return true;
+  });
+
+  if (visibleCards.length === 0) {
+    grid.innerHTML = '';
+    empty.hidden = false;
+    countEl.textContent = '';
+    return;
+  }
+  empty.hidden = true;
+
+  title.textContent = showCollection ? 'Your Collection' : 'The Collection';
+  countEl.textContent = `${visibleCards.length} cards`;
+
+  grid.innerHTML = visibleCards.map(c => {
+    const id = c[0], name = c[1], rarity = c[2];
+    const isFav = favs.has(id);
+    return `
+      <div class="card" data-id="${id}" data-rarity="${rarity}">
+        <img data-base="card_${id}" alt="${name}" decoding="async">
+        <div class="info">
+          <strong>${name}</strong>
+          <div class="rarity" style="color:${RARITY_COLOR[rarity]||'var(--accent)'}">${rarity}</div>
+        </div>
+        <button class="fav ${isFav ? 'favorited' : ''}" aria-label="Toggle favorite">${isFav ? '❤' : '♡'}</button>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+
+  grid.querySelectorAll('.card').forEach(cardEl => {
+    const id = cardEl.dataset.id;
+    
+    cardEl.addEventListener('click', (e) => {
+      if (e.target.classList.contains('fav')) return;
+      const idx = cards.findIndex(c => c[0] === id);
+      if (idx !== -1) openLightbox(idx);
+    });
+
+    const favBtn = cardEl.querySelector('.fav');
+    favBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (favs.has(id)) {
+        favs.delete(id);
+        favBtn.textContent = '♡';
+        favBtn.classList.remove('favorited');
+      } else {
+        favs.add(id);
+        favBtn.textContent = '❤';
+        favBtn.classList.add('favorited');
+      }
+      localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
+      if (showCollection) renderGallery();
+    });
+  });
+}
+
+/* ---------- Lightbox with fixes ---------- */
+function openLightbox(index) {
+  currentLightboxIndex = index;
+  const c = cards[index];
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lbImg');
+  
+  loadSmart(img, 'card_' + c[0]);
+  document.getElementById('lbName').textContent = c[1];
+  document.getElementById('lbRarity').innerHTML = `<span style="color:${RARITY_COLOR[c[2]]}">${c[2]}</span>`;
+  
+  lb.classList.add('open');
+
+  // Download
+  document.getElementById('lbDownload').onclick = () => {
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = c[1].replace(/[^a-z0-9]/gi, '_') + '_ShayDex.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Share card
+  document.getElementById('lbShareCard').onclick = async () => {
+    const shareData = { title: c[1] + ' — ShayDex', text: c[1] + ' (' + c[2] + ') from the ShayDex archive.', url: location.href };
+    if (navigator.share) { try { await navigator.share(shareData); } catch(e){} }
+    else {
+      try {
+        await navigator.clipboard.writeText(location.href);
+        showToast('Link copied!');
+      } catch(e) {}
+    }
+  };
+}
+
+function navigateLightbox(dir) {
+  const next = ((currentLightboxIndex + dir) + cards.length) % cards.length;
+  currentLightboxIndex = next;
+  openLightbox(currentLightboxIndex);
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+/* ---------- Search ---------- */
+const searchBtn = document.getElementById('searchBtn');
+const searchOverlay = document.getElementById('searchOverlay');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchBtn.onclick = () => {
+  searchOverlay.style.display = 'flex';
+  searchInput.focus();
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+};
+
+searchOverlay.onclick = (e) => { if (e.target === searchOverlay) searchOverlay.style.display = 'none'; };
+
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase().trim();
+  if (!q) { searchResults.innerHTML = ''; return; }
+  
+  const results = cards.filter(c => {
+    if (MYSTERY_IDS.has(c[0]) && !revealed.has(c[0])) return false;
+    return c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q);
+  });
+  
+  searchResults.innerHTML = results.length ? results.map(c => {
+    const idx = cards.findIndex(x => x[0] === c[0]);
+    return `<div style="padding:13px 18px;border-bottom:1px solid #222;cursor:pointer;display:flex;gap:14px;align-items:center" onclick="document.getElementById('searchOverlay').style.display='none'; openLightbox(${idx})">
+      <div style="width:48px;height:67px;background:#222;border-radius:6px;overflow:hidden;flex-shrink:0">
+        <img data-base="card_${c[0]}" style="width:100%;height:100%;object-fit:cover" decoding="async">
+      </div>
+      <div><div style="font-weight:600">${c[1]}</div><div style="color:#f5c842;font-size:.82rem;margin-top:1px">${c[2]}</div></div>
+    </div>`;
+  }).join('') : `<div style="padding:18px;color:#666">No matches.</div>`;
+  
+  searchResults.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+};
+
+/* ---------- Collection Toggle ---------- */
+// Handled in init()
+
+/* ---------- Share ---------- */
+document.getElementById('shareBtn').onclick = async () => {
+  const data = { title: 'ShayDex — The Gallery', text: 'Clean gallery of every Shaylen card.', url: location.href };
+  if (navigator.share) { try { await navigator.share(data); } catch(e){} }
+  else {
+    try { await navigator.clipboard.writeText(location.href); showToast('Link copied!'); } catch(e){}
+  }
+};
+
+/* ---------- Init with lightbox listeners ---------- */
+window.openLightbox = openLightbox;
+
+function init() {
+  document.getElementById('headerCount').textContent = 'V III';
+  
+  renderNewDrops();
+  renderGallery();
+  
+  // Lightbox event listeners
+  document.getElementById('lightboxClose').onclick = closeLightbox;
+  document.getElementById('lbPrev').onclick = () => navigateLightbox(-1);
+  document.getElementById('lbNext').onclick = () => navigateLightbox(1);
+  
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (lb.classList.contains('open')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    }
+    if (e.key === 'Escape' && searchOverlay.style.display === 'flex') searchOverlay.style.display = 'none';
+    if (e.key === '/' && document.activeElement.tagName === 'BODY') { e.preventDefault(); searchBtn.click(); }
+  });
+  
+  // Close lightbox on background click
+  document.getElementById('lightbox').onclick = (e) => {
+    if (e.target.id === 'lightbox') closeLightbox();
+  };
+
+  // Touch swipe for lightbox
+  let _tsX = null;
+  document.getElementById('lightbox').addEventListener('touchstart', e => {
+    _tsX = e.touches[0].clientX;
+  }, { passive: true });
+  document.getElementById('lightbox').addEventListener('touchend', e => {
+    if (_tsX === null) return;
+    const dx = e.changedTouches[0].clientX - _tsX;
+    if (Math.abs(dx) > 50) navigateLightbox(dx < 0 ? 1 : -1);
+    _tsX = null;
+  }, { passive: true });
+
+  // Collection button: update icon when toggled
+  document.getElementById('collectionBtn').addEventListener('click', () => {
+    showCollection = !showCollection;
+    document.getElementById('collectionBtn').textContent = showCollection ? '❤' : '♡';
+    document.getElementById('collectionBtn').classList.toggle('active', showCollection);
+    renderGallery();
+  });
+
+  // Rarity filter pills
+  document.getElementById('rarityFilter').addEventListener('click', e => {
+    const pill = e.target.closest('.rarity-pill');
+    if (!pill) return;
+    activeRarity = pill.dataset.rarity;
+    document.querySelectorAll('.rarity-pill').forEach(p => p.classList.toggle('active', p === pill));
+    renderGallery();
+  });
+}
+
+/* ---------- Toast ---------- */
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(8px);background:#f0f0f0;color:#0a0a0a;padding:9px 20px;border-radius:999px;font-size:.82rem;font-family:inherit;opacity:0;transition:opacity .2s,transform .2s;z-index:999;pointer-events:none;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(8px)';
+  }, 1800);
+}
+
+init();
+
+})();
+</script>
 </body>
 </html>
