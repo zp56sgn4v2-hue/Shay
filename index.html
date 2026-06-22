@@ -528,13 +528,23 @@ let featured=pickFeatured();
 /* ---------- image loader with extension fallback ---------- */
 const _imgCache={};
 function loadSmart(img,base){
-  if(_imgCache[base]){img.src=_imgCache[base];img.classList.add('loaded');const sk=img.closest('.card-media')?.querySelector('.skeleton');if(sk)sk.classList.add('hide');return;}
-  const tries=[base+'.jpeg',base+'.jpg',base+'.webp',base+'.png',base+'.JPEG',base+'.JPG'];
+  function reveal(){
+    img.classList.add('loaded');
+    const sk=img.closest('.card-media')?.querySelector('.skeleton');
+    if(sk)sk.classList.add('hide');
+  }
+  if(_imgCache[base]){
+    img.src=_imgCache[base];
+    if(img.complete&&img.naturalWidth)reveal();
+    else img.addEventListener('load',reveal,{once:true});
+    return;
+  }
+  const tries=[base+'.jpeg',base+'.jpg',base+'.webp',base+'.png'];
   let i=0;
   (function next(){
     if(i>=tries.length)return;
     img.onerror=()=>{i++;next();};
-    img.onload=()=>{_imgCache[base]=img.src;};
+    img.addEventListener('load',()=>{_imgCache[base]=img.src;reveal();},{once:true});
     img.src=tries[i];
   })();
 }
@@ -633,7 +643,7 @@ function renderGrid(){
       <button class="fav-btn" aria-label="Toggle favorite ${name}" aria-pressed="false"${isMystery?' hidden':''}>☆</button>
       <div class="card-media">
         <div class="skeleton"></div>
-        <img data-base="card_${id}" alt="${isMystery?'Mystery card':name+' card art'}" loading="lazy" decoding="async">
+        <img data-base="card_${id}" alt="${isMystery?'Mystery card':name+' card art'}" decoding="async">
         ${isMystery?`<button class="mystery-cover" type="button" aria-label="Reveal the newest Shaylen card">
           <span class="mystery-badge">✦ NEW PULL</span>
           <span class="mystery-q">?</span>
@@ -650,10 +660,6 @@ function renderGrid(){
 
   grid.querySelectorAll('[data-base]').forEach(img=>{
     loadSmart(img,img.dataset.base);
-    img.addEventListener('load',()=>{
-      img.classList.add('loaded');
-      img.closest('.card-media').querySelector('.skeleton').classList.add('hide');
-    });
   });
 
   grid.querySelectorAll('.mystery-cover').forEach(btn=>{
