@@ -483,8 +483,12 @@ const cards=[
 ['13','Devious Shaylen','Secret Rare'],['14','Shocker Shaylen','Basic'],['15','Evil Shaylen','Dark'],
 ['16','Innocent Shaylen','Basic'],['17','Hefty Shaylen','Basic'],
 ['18','Groovin’ Shaylen','Rare'],['19','Hungry Shaylen','Basic'],['20','Hangry Shaylen','Rare'],
-['21','Sunburnt Shaylen','Secret Rare'],['22','Nature Shaylen','Rare']
+['21','Sunburnt Shaylen','Secret Rare'],['22','Nature Shaylen','Rare'],
+['23','Shaylen And The Bros','Secret Rare'],['24','Bizarre Shaylen','Rare'],['25','Grafiti Shaylen','Rare']
 ].sort((a,b)=>Number(b[0])-Number(a[0])); // newest (highest id) first
+
+/* IDs that are hidden mystery reveals */
+const MYSTERY_IDS=new Set(['23','24','25']);
 
 const RARITY_ORDER=['Basic','Rare','Secret Rare','Eternal Legend','Dark'];
 const RARITY_COLOR={Basic:'var(--rarity-basic)',Rare:'var(--rarity-rare)','Secret Rare':'var(--rarity-secret)','Eternal Legend':'var(--rarity-legend)',Dark:'var(--rarity-dark)'};
@@ -504,11 +508,10 @@ const REVEAL_KEY='shaydexRevealed';
 const getRevealed=()=>{try{return new Set(JSON.parse(localStorage.getItem(REVEAL_KEY)||'[]'))}catch(e){return new Set()}};
 const setRevealed=s=>localStorage.setItem(REVEAL_KEY,JSON.stringify([...s]));
 let revealed=getRevealed();
-const latestId=cards[0][0]; // cards are sorted newest-first, so this is the newest pull
-const isLatestRevealed=()=>revealed.has(latestId);
+const isMysteryCard=id=>MYSTERY_IDS.has(id)&&!revealed.has(id);
 
 function pickFeatured(){
-  const pool=cards.filter(c=>c[0]!==latestId||isLatestRevealed());
+  const pool=cards.filter(c=>!isMysteryCard(c[0]));
   return pool[Math.floor(Math.random()*pool.length)];
 }
 let featured=pickFeatured();
@@ -607,7 +610,7 @@ function renderGrid(){
   const grid=document.getElementById('grid');
   grid.innerHTML=cards.map(c=>{
     const id=c[0],name=c[1],rarity=c[2];
-    const isMystery=id===latestId&&!revealed.has(id);
+    const isMystery=isMysteryCard(id);
     return `<div class="card${isMystery?' is-mystery':''}" data-id="${id}" data-rarity="${rarity}" data-search="${isMystery?'mystery new pull':(name+' '+rarity).toLowerCase()}">
       <button class="fav-btn" aria-label="Toggle favorite ${name}" aria-pressed="false"${isMystery?' hidden':''}>☆</button>
       <div class="card-media">
@@ -793,7 +796,7 @@ function openModal(){
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 function navModal(dir){
   let next=(modalIndex+dir+cards.length)%cards.length;
-  if(cards[next][0]===latestId&&!revealed.has(latestId)){
+  if(isMysteryCard(cards[next][0])){
     next=(next+dir+cards.length)%cards.length;
   }
   modalIndex=next;
