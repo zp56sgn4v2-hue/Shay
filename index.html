@@ -113,24 +113,14 @@ header {
   text-transform: uppercase;
 }
 .drops-strip {
-  display:flex;
-  gap:18px;
-  overflow-x:auto;
-  justify-content:center;
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
   padding-bottom: 10px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 .drops-strip::-webkit-scrollbar { display: none; }
-
-.reveal-card{
- animation: revealFade .8s ease;
-}
-@keyframes revealFade{
- 0%{opacity:.2;transform:scale(.92)}
- 60%{opacity:1;transform:scale(1.04)}
- 100%{opacity:1;transform:scale(1)}
-}
 
 .flip-card {
   flex: 0 0 162px;
@@ -553,16 +543,35 @@ let currentLightboxIndex = -1;
 const imgCache = {};
 function loadSmart(img, base) {
   if (imgCache[base]) { img.src = imgCache[base]; return; }
-  const tries = [base+'.jpg', base+'.jpeg', base+'.png', base+'.webp'];
+
+  const tries = [
+    base+'.jpeg', base+'.JPEG',
+    base+'.jpg',  base+'.JPG',
+    base+'.png',  base+'.PNG',
+    base+'.webp', base+'.WEBP'
+  ];
+
   let i = 0;
+
   function tryNext() {
     if (i >= tries.length) return;
+
     const src = tries[i];
     const probe = new Image();
-    probe.onload = () => { imgCache[base] = src; img.src = src; };
-    probe.onerror = () => { i++; tryNext(); };
+
+    probe.onload = () => {
+      imgCache[base] = src;
+      img.src = src;
+    };
+
+    probe.onerror = () => {
+      i++;
+      tryNext();
+    };
+
     probe.src = src;
   }
+
   tryNext();
 }
 
@@ -577,17 +586,16 @@ function renderNewDrops() {
   
   container.innerHTML = unrevealed.map(c => {
     const id = c[0];
-    const isRevealed = revealed.has(id);
-    return isRevealed ? `
-      <div class="flip-card reveal-card" data-id="${id}">
-        <div class="flip-card-back" style="position:relative;transform:none">
-          <img data-base="card_${id}" alt="${c[1]}">
-        </div>
-      </div>
-    ` : `
-      <div class="flip-card pulse" data-id="${id}">
-        <div class="flip-card-front">
-          <div class="logo" style="font-size:1.3rem;letter-spacing:2px">SHAYDEX</div>
+    const flipped = revealed.has(id) ? "flipped" : "";
+    return `
+      <div class="flip-card ${flipped} pulse" data-id="${id}">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="logo">S</div>
+          </div>
+          <div class="flip-card-back">
+            <img data-base="card_${id}" alt="${c[1]}">
+          </div>
         </div>
       </div>
     `;
@@ -600,12 +608,15 @@ function renderNewDrops() {
 
     cardEl.addEventListener('click', () => {
       if (revealed.has(id)) return;
-      revealed.add(id);
-      localStorage.setItem(REVEAL_KEY, JSON.stringify([...revealed]));
-      renderGallery();
-      renderNewDrops();
-
+      cardEl.classList.add('flipped');
+      
       setTimeout(() => {
+        revealed.add(id);
+        localStorage.setItem(REVEAL_KEY, JSON.stringify([...revealed]));
+        renderGallery();
+        renderNewDrops();
+        
+        setTimeout(() => {
           const idx = cards.findIndex(c => c[0] === id);
           if (idx !== -1) openLightbox(idx);
         }, 380);
@@ -764,6 +775,8 @@ document.getElementById('shareBtn').onclick = async () => {
 };
 
 /* ---------- Init with lightbox listeners ---------- */
+window.openLightbox = openLightbox;
+
 function init() {
   document.getElementById('headerCount').textContent = `${cards.length} cards`;
   
