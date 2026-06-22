@@ -533,19 +533,19 @@ function loadSmart(img,base){
     const sk=img.closest('.card-media')?.querySelector('.skeleton');
     if(sk)sk.classList.add('hide');
   }
-  if(_imgCache[base]){
-    img.src=_imgCache[base];
-    if(img.complete&&img.naturalWidth)reveal();
-    else img.addEventListener('load',reveal,{once:true});
-    return;
+  function applyUrl(src){
+    if(img.complete&&img.naturalWidth&&img.src.endsWith(src.split('/').pop())){reveal();return;}
+    img.addEventListener('load',reveal,{once:true});
+    img.src=src;
   }
-  const tries=[base+'.jpeg',base+'.jpg',base+'.webp',base+'.png'];
+  if(_imgCache[base]){applyUrl(_imgCache[base]);return;}
+  const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
   let i=0;
   function attempt(){
     if(i>=tries.length)return;
     const src=tries[i];
     const probe=new Image();
-    probe.onload=()=>{_imgCache[base]=src;img.src=src;reveal();};
+    probe.onload=()=>{_imgCache[base]=src;applyUrl(src);};
     probe.onerror=()=>{i++;attempt();};
     probe.src=src;
   }
