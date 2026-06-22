@@ -16,9 +16,13 @@
 <meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
 <meta name="theme-color" content="#050309">
 
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"></noscript>
 <style>
 /* ====================== TOKENS ====================== */
 :root{
@@ -90,7 +94,7 @@ body{
 
 /* ambient nebula glow, fixed behind everything */
 .nebula{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-.nebula i{position:absolute;border-radius:50%;filter:blur(120px);opacity:.35}
+.nebula i{position:absolute;border-radius:50%;filter:blur(120px);opacity:.35;will-change:transform;contain:strict}
 .nebula i:nth-child(1){width:520px;height:520px;background:var(--violet);left:-180px;top:-160px}
 .nebula i:nth-child(2){width:460px;height:460px;background:var(--cyan);right:-160px;top:60px}
 .nebula i:nth-child(3){width:420px;height:420px;background:var(--pink);left:30%;bottom:-220px;opacity:.18}
@@ -238,8 +242,12 @@ button{font-family:inherit}
   transform-style:preserve-3d;
   transition:transform .08s linear,box-shadow .25s ease,opacity .4s ease,border-color .25s ease;
   opacity:0;transform:translateY(10px);
+  will-change:transform,opacity;
+  content-visibility:auto;
+  contain-intrinsic-size:auto 320px;
 }
 .card.in{opacity:1;transform:none}
+.card.in{will-change:auto}
 .card-media{position:relative;aspect-ratio:5/7;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));overflow:hidden}
 .card-media img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s ease}
 .card-media img.loaded{opacity:1}
@@ -388,7 +396,7 @@ button{font-family:inherit}
 <div class="nebula"><i></i><i></i><i></i></div>
 
 <header class="hero">
-  <div class="eyebrow">V. II</div>
+  <div class="eyebrow" id="heroEyebrow">V. II</div>
   <h1>SHAYDEX</h1>
   <p>The Official Shaylen Trading Card Archive</p>
   <button class="btn btn-ghost share-btn" id="shareBtn" type="button">🔗 Share ShayDex</button>
@@ -397,7 +405,8 @@ button{font-family:inherit}
 <section class="glass featured" id="featuredSection">
   <div class="featured-frame">
     <div class="featured-glow" id="featuredGlow"></div>
-    <img id="featuredImg" alt="">
+    <div class="skeleton" id="featuredSkeleton"></div>
+    <img id="featuredImg" alt="" decoding="async" fetchpriority="high" style="opacity:0;transition:opacity .4s ease">
   </div>
   <div>
     <div class="eyebrow-gold">★ Featured Pull</div>
@@ -456,13 +465,13 @@ button{font-family:inherit}
 
 <div id="grid" class="grid grid-mode"></div>
 
-<div class="footer">ShayDex · Collect · Discover · Archive</div>
+<div class="footer">ShayDex v2 &nbsp;·&nbsp; Collect &nbsp;·&nbsp; Discover &nbsp;·&nbsp; Archive &nbsp;·&nbsp; Made with ✨ for Shaylen</div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Card preview">
   <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
   <button class="modal-nav prev" id="modalPrev" aria-label="Previous card">‹</button>
   <div class="modal-inner">
-    <img id="modalImg" alt="">
+    <img id="modalImg" alt="" decoding="async">
     <div class="modal-caption" id="modalCaption"></div>
   </div>
   <button class="modal-nav next" id="modalNext" aria-label="Next card">›</button>
@@ -517,12 +526,15 @@ function pickFeatured(){
 let featured=pickFeatured();
 
 /* ---------- image loader with extension fallback ---------- */
+const _imgCache={};
 function loadSmart(img,base){
-  const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+  if(_imgCache[base]){img.src=_imgCache[base];img.classList.add('loaded');const sk=img.closest('.card-media')?.querySelector('.skeleton');if(sk)sk.classList.add('hide');return;}
+  const tries=[base+'.jpeg',base+'.jpg',base+'.webp',base+'.png',base+'.JPEG',base+'.JPG'];
   let i=0;
   (function next(){
     if(i>=tries.length)return;
-    img.onerror=()=>{i++;next()};
+    img.onerror=()=>{i++;next();};
+    img.onload=()=>{_imgCache[base]=img.src;};
     img.src=tries[i];
   })();
 }
@@ -564,8 +576,14 @@ if(shareBtn){
 function renderFeatured(){
   document.getElementById('featuredName').textContent=featured[1];
   document.getElementById('featuredType').textContent=featured[2];
-  loadSmart(document.getElementById('featuredImg'),'card_'+featured[0]);
-  document.getElementById('featuredGlow').style.background=RARITY_COLOR[featured[2]]||'var(--gold)';
+  const fImg=document.getElementById('featuredImg');
+  const fSkel=document.getElementById('featuredSkeleton');
+  fImg.style.opacity='0';
+  if(fSkel)fSkel.style.display='';
+  fImg.onload=()=>{fImg.style.opacity='1';if(fSkel)fSkel.style.display='none';};
+  loadSmart(fImg,'card_'+featured[0]);
+  const GLOW_HEX={Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Dark:'#f87171'};
+  document.getElementById('featuredGlow').style.background=GLOW_HEX[featured[2]]||'#facc15';
 }
 document.getElementById('shuffleFeatured').onclick=()=>{
   featured=pickFeatured();
@@ -615,9 +633,9 @@ function renderGrid(){
       <button class="fav-btn" aria-label="Toggle favorite ${name}" aria-pressed="false"${isMystery?' hidden':''}>☆</button>
       <div class="card-media">
         <div class="skeleton"></div>
-        <img data-base="card_${id}" alt="${isMystery?'Mystery card':name+' card art'}">
+        <img data-base="card_${id}" alt="${isMystery?'Mystery card':name+' card art'}" loading="lazy" decoding="async">
         ${isMystery?`<button class="mystery-cover" type="button" aria-label="Reveal the newest Shaylen card">
-          <span class="mystery-badge">NEW PULL</span>
+          <span class="mystery-badge">✦ NEW PULL</span>
           <span class="mystery-q">?</span>
           <span class="mystery-cta">Tap to reveal</span>
         </button>
@@ -660,13 +678,18 @@ function renderGrid(){
   });
 
   grid.querySelectorAll('.card').forEach(card=>{
+    let _tiltRaf=null;
     card.addEventListener('mousemove',e=>{
-      const r=card.getBoundingClientRect();
-      const x=(e.clientX-r.left-r.width/2)/(r.width/2);
-      const y=(e.clientY-r.top-r.height/2)/(r.height/2);
-      card.style.transform=`perspective(1000px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.025)`;
+      if(_tiltRaf)return;
+      _tiltRaf=requestAnimationFrame(()=>{
+        _tiltRaf=null;
+        const r=card.getBoundingClientRect();
+        const x=(e.clientX-r.left-r.width/2)/(r.width/2);
+        const y=(e.clientY-r.top-r.height/2)/(r.height/2);
+        card.style.transform=`perspective(1000px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.025)`;
+      });
     });
-    card.addEventListener('mouseleave',()=>{card.style.transform='';});
+    card.addEventListener('mouseleave',()=>{_tiltRaf=null;card.style.transform='';});
     card.querySelector('.card-media').addEventListener('click',()=>{
       if(card.classList.contains('is-mystery'))return;
       modalIndex=cards.findIndex(c=>c[0]===card.dataset.id);
@@ -716,10 +739,9 @@ function staggerIn(){
     entries.forEach(en=>{
       if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
     });
-  },{threshold:.1});
-  items.forEach((c,i)=>{
-    setTimeout(()=>io.observe(c),i*15);
-  });
+  },{threshold:.08,rootMargin:'0px 0px 60px 0px'});
+  const schedule=(window.requestIdleCallback||setTimeout);
+  schedule(()=>items.forEach(c=>io.observe(c)));
 }
 
 function syncFavoriteUI(){
@@ -777,9 +799,11 @@ document.getElementById('binderBtn').onclick=()=>{
 };
 
 /* ---------- search / view ---------- */
+let _searchDebounce=null;
 document.getElementById('search').addEventListener('input',e=>{
   searchTerm=e.target.value;
-  applyFilters();
+  clearTimeout(_searchDebounce);
+  _searchDebounce=setTimeout(applyFilters,120);
 });
 document.getElementById('viewMode').addEventListener('change',e=>{
   document.getElementById('grid').className='grid '+e.target.value;
@@ -816,6 +840,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- init ---------- */
+document.getElementById('heroEyebrow').textContent='V. II · '+cards.length+' cards';
 renderFeatured();
 renderStats();
 renderChips();
