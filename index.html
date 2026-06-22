@@ -134,7 +134,7 @@ header {
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.95s cubic-bezier(.22,1,.36,1);
+  transition: transform 0.65s cubic-bezier(.23,1.0,.32,1);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -469,7 +469,7 @@ header {
 
 <!-- New Drops -->
 <section class="new-drops" id="newDropsSection">
-  <h2>New Drops</h2><div id="hiddenCounter" style="color:#f5c842;font-size:.8rem;margin-bottom:12px"></div>
+  <h2>New Drops</h2>
   <div class="drops-strip" id="dropsStrip"></div>
 </section>
 
@@ -543,16 +543,35 @@ let currentLightboxIndex = -1;
 const imgCache = {};
 function loadSmart(img, base) {
   if (imgCache[base]) { img.src = imgCache[base]; return; }
-  const tries = [base+'.jpg', base+'.jpeg', base+'.png', base+'.webp'];
+
+  const tries = [
+    base+'.jpeg', base+'.JPEG',
+    base+'.jpg',  base+'.JPG',
+    base+'.png',  base+'.PNG',
+    base+'.webp', base+'.WEBP'
+  ];
+
   let i = 0;
+
   function tryNext() {
     if (i >= tries.length) return;
+
     const src = tries[i];
     const probe = new Image();
-    probe.onload = () => { imgCache[base] = src; img.src = src; };
-    probe.onerror = () => { i++; tryNext(); };
+
+    probe.onload = () => {
+      imgCache[base] = src;
+      img.src = src;
+    };
+
+    probe.onerror = () => {
+      i++;
+      tryNext();
+    };
+
     probe.src = src;
   }
+
   tryNext();
 }
 
@@ -561,26 +580,18 @@ function renderNewDrops() {
   const container = document.getElementById('dropsStrip');
   const section = document.getElementById('newDropsSection');
   
-  const unrevealed = cards.filter(c => MYSTERY_IDS.has(c[0]) && !revealed.has(c[0]));
+  const unrevealed = cards.filter(c => MYSTERY_IDS.has(c[0]));
   
-  if (unrevealed.length === 0) {
-    section.style.display = 'none';
-    return;
-  }
   section.style.display = '';
-  document.getElementById('hiddenCounter').textContent = `${unrevealed.length} Hidden Cards Remaining`;
   
   container.innerHTML = unrevealed.map(c => {
     const id = c[0];
+    const flipped = revealed.has(id) ? "flipped" : "";
     return `
-      <div class="flip-card pulse" data-id="${id}">
+      <div class="flip-card ${flipped} pulse" data-id="${id}">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div style="position:relative;z-index:2;text-align:center">
-              <div style="font-size:2rem;color:#f5c842;font-weight:700">SHAYDEX</div>
-              <div style="font-size:.75rem;color:#999;letter-spacing:2px;margin-top:8px">MYSTERY DROP</div>
-              <div style="margin-top:14px;background:#f5c842;color:#000;padding:4px 10px;border-radius:999px;font-size:.7rem;font-weight:700;display:inline-block">NEW</div>
-            </div>
+            <div class="logo">S</div>
           </div>
           <div class="flip-card-back">
             <img data-base="card_${id}" alt="${c[1]}">
@@ -609,7 +620,7 @@ function renderNewDrops() {
           const idx = cards.findIndex(c => c[0] === id);
           if (idx !== -1) openLightbox(idx);
         }, 380);
-      }, 1050);
+      }, 680);
     });
   });
 }
@@ -764,6 +775,8 @@ document.getElementById('shareBtn').onclick = async () => {
 };
 
 /* ---------- Init with lightbox listeners ---------- */
+window.openLightbox = openLightbox;
+
 function init() {
   document.getElementById('headerCount').textContent = `${cards.length} cards`;
   
