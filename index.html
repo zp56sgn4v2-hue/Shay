@@ -962,7 +962,7 @@ header {
     <div class="arena-header">
       <button class="arena-close" id="arenaClose" aria-label="Close arena">✕</button>
       <div class="arena-title-block">
-        <div class="arena-eyebrow">Bro Co. Battle System</div>
+        
         <h2 class="arena-title">⚔ The Arena</h2>
         <p class="arena-subtitle">Choose your fighters. Let destiny decide.</p>
       </div>
@@ -1000,13 +1000,8 @@ header {
     </div>
 
     
-<div class="arena-v4-hub">
-<div class="arena-dashboard">
-<div class="arena-stat"><div>Arena Battles</div><div class="arena-stat-value" id="v4BattleCount">0</div></div>
-<div class="arena-stat"><div>Champion</div><div class="arena-stat-value" id="v4Champion">-</div></div>
-<div class="arena-stat"><div>Win Streak</div><div class="arena-stat-value" id="v4Streak">0</div></div>
-<div class="arena-stat"><button class="battle-btn secondary" id="randomBattleBtn">🎲 Random Battle</button></div>
-</div>
+<div class="arena-v4-hub" style="display:flex;justify-content:center">
+<button class="battle-btn secondary" id="randomBattleBtn" style="padding:8px 16px;font-size:.75rem">🎲 Random Battle</button>
 </div>
 
 <!-- Battle button -->
@@ -1566,21 +1561,29 @@ async function generateBattleShareImage(idA,idB,nameA,nameB,winner,storyText){
  const canvas=document.createElement('canvas');
  canvas.width=1080; canvas.height=1350;
  const ctx=canvas.getContext('2d');
- ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle='#f5c842'; ctx.font='bold 54px sans-serif';
- ctx.fillText('SHAYDEX ARENA',320,80);
- ctx.fillStyle='#fff'; ctx.font='38px sans-serif';
- ctx.fillText(nameA+'  ⚔  '+nameB,120,140);
- ctx.fillText('Winner: '+(winner==='TIE'?'Draw':(winner==='A'?nameA:nameB)),120,200);
- ctx.font='28px sans-serif';
- const lines=(storyText||'').replace(/<[^>]+>/g,'').match(/.{1,55}/g)||[];
- let y=280; lines.slice(0,20).forEach(l=>{ctx.fillText(l,60,y); y+=42;});
- return await new Promise(r=>canvas.toBlob(async b=>{
-   const f=new File([b],'shaydex-battle.png',{type:'image/png'});
-   r(f);
- }));
-}
+ const grad=ctx.createLinearGradient(0,0,1080,1350);
+ grad.addColorStop(0,'#111'); grad.addColorStop(1,'#000');
+ ctx.fillStyle=grad; ctx.fillRect(0,0,1080,1350);
+ ctx.fillStyle='#f5c842';
+ ctx.font='bold 64px sans-serif';
+ ctx.textAlign='center';
+ ctx.fillText('SHAYDEX ARENA',540,90);
 
+ function load(src){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});}
+ const aimg=await load(imgCache['card_'+idA]||('card_'+idA+'.jpg'));
+ const bimg=await load(imgCache['card_'+idB]||('card_'+idB+'.jpg'));
+ if(aimg) ctx.drawImage(aimg,120,220,340,476);
+ if(bimg) ctx.drawImage(bimg,620,220,340,476);
+ ctx.fillStyle='#fff';
+ ctx.font='bold 42px sans-serif';
+ ctx.fillText('VS',540,480);
+ const winnerName=winner==='TIE'?'DRAW':(winner==='A'?nameA:nameB);
+ ctx.font='bold 54px sans-serif';
+ ctx.fillStyle='#f5c842';
+ ctx.fillText('WINNER: '+winnerName.toUpperCase(),540,820);
+ ctx.strokeStyle='#f5c842'; ctx.strokeRect(70,70,940,1210);
+ return await new Promise(r=>canvas.toBlob(b=>r(new File([b],'shaydex-arena.png',{type:'image/png'}))));
+}
 function showBattleResult(idA, idB, nameA, nameB) {
   const { paragraphs, winner } = buildBattleStory(nameA, nameB);
 
@@ -1727,8 +1730,7 @@ buildBattleStory=function(nameA,nameB){
  const cardB=cards.find(c=>c[1]===nameB);
  const pA=getPower(cardA);
  const pB=getPower(cardB);
- result.paragraphs=`<p><strong>Power Scan:</strong> ${nameA} (${pA}) vs ${nameB} (${pB})</p>`+result.paragraphs;
- if(Math.abs(pA-pB)>12){
+  if(Math.abs(pA-pB)>12){
    result.winner=pA>pB?'A':'B';
  }
  return result;
