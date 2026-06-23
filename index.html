@@ -1013,7 +1013,7 @@ header {
     <div class="battle-result" id="battleResult" hidden>
       <div class="result-vs-bar">
         <div class="result-fighter" id="resultFighterA"></div>
-        <div class="result-vs">⚔</div>
+        <div class="result-vs">VS</div>
         <div class="result-fighter" id="resultFighterB"></div>
       </div>
       <div class="battle-story" id="battleStory"></div>
@@ -1057,10 +1057,15 @@ const cards = [
   ['22','Nature Shaylen','Rare'],
   ['23','Shaylen And The Bros','Basic'],
   ['24','Bizarre Shaylen','Basic'],
-  ['25','Grafiti Shaylen','Basic']
+  ['25','Grafiti Shaylen','Basic'],
+  ['26','Thumbs Up Shaylen','Basic'],
+  ['27','Eye Spy Shaylen','Rare'],
+  ['28','Vampire Shaylen','Dark'],
+  ['29','Ghost Shaylen','Basic'],
+  ['30','Crafty Shaylen','Basic']
 ].sort((a,b) => Number(b[0]) - Number(a[0]));
 
-const MYSTERY_IDS = new Set(['23','24','25']);
+const MYSTERY_IDS = new Set(['26','27','28','29','30']);
 const RARITY_COLOR = {Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Dark:'#f87171'};
 
 const FAV_KEY = 'shaydexFavorites_v3';
@@ -1557,33 +1562,124 @@ function runBattle() {
 }
 
 
+
+
+
 async function generateBattleShareImage(idA,idB,nameA,nameB,winner,storyText){
  const canvas=document.createElement('canvas');
  canvas.width=1080; canvas.height=1350;
  const ctx=canvas.getContext('2d');
- const grad=ctx.createLinearGradient(0,0,1080,1350);
- grad.addColorStop(0,'#111'); grad.addColorStop(1,'#000');
- ctx.fillStyle=grad; ctx.fillRect(0,0,1080,1350);
- ctx.fillStyle='#f5c842';
- ctx.font='bold 64px sans-serif';
- ctx.textAlign='center';
- ctx.fillText('SHAYDEX ARENA',540,90);
+
+ 
+const bg=ctx.createRadialGradient(540,500,50,540,700,1000);
+
+ bg.addColorStop(0,'#202020');
+ bg.addColorStop(.5,'#0b0b0b');
+ bg.addColorStop(1,'#000000');
+ ctx.fillStyle=bg;
+ ctx.fillRect(0,0,1080,1350);
+
+const spot=ctx.createRadialGradient(540,420,50,540,420,500);
+spot.addColorStop(0,'rgba(245,200,66,.18)');
+spot.addColorStop(1,'rgba(245,200,66,0)');
+ctx.fillStyle=spot;
+ctx.fillRect(0,0,1080,1350);
+
+for(let i=0;i<80;i++){
+ ctx.fillStyle='rgba(245,200,66,'+(Math.random()*0.12)+')';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*3+1,0,Math.PI*2);
+ ctx.fill();
+}
+
+for(let i=0;i<50;i++){
+ ctx.fillStyle='rgba(255,255,255,0.02)';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*220+60,0,Math.PI*2);
+ ctx.fill();
+}
+
+for(let i=0;i<35;i++){
+ ctx.fillStyle='rgba(255,255,255,0.03)';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*180+80,0,Math.PI*2);
+ ctx.fill();
+}
+
 
  function load(src){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});}
+
  const aimg=await load(imgCache['card_'+idA]||('card_'+idA+'.jpg'));
  const bimg=await load(imgCache['card_'+idB]||('card_'+idB+'.jpg'));
- if(aimg) ctx.drawImage(aimg,120,220,340,476);
- if(bimg) ctx.drawImage(bimg,620,220,340,476);
- ctx.fillStyle='#fff';
- ctx.font='bold 42px sans-serif';
- ctx.fillText('VS',540,480);
- const winnerName=winner==='TIE'?'DRAW':(winner==='A'?nameA:nameB);
- ctx.font='bold 54px sans-serif';
+
+ const leftWon = winner==='A';
+ const winnerName = leftWon ? nameA : nameB;
+
+ ctx.textAlign='center';
  ctx.fillStyle='#f5c842';
- ctx.fillText('WINNER: '+winnerName.toUpperCase(),540,820);
- ctx.strokeStyle='#f5c842'; ctx.strokeRect(70,70,940,1210);
- return await new Promise(r=>canvas.toBlob(b=>r(new File([b],'shaydex-arena.png',{type:'image/png'}))));
+ ctx.font='900 74px Cinzel';
+ ctx.fillText('THE ARENA',540,90);
+
+ ctx.fillStyle='#9f9f9f';
+ ctx.font='italic 28px Bebas Neue';
+ ctx.fillText('CINEMATIC SHOWDOWN',540,130);
+
+ if(aimg){
+   ctx.save();
+   if(leftWon){ctx.shadowColor='#f5c842';ctx.shadowBlur=30;} else {ctx.globalAlpha=.55;}
+   ctx.drawImage(aimg,110,220,leftWon?380:350,leftWon?532:490);
+   ctx.restore();
+ }
+
+ if(bimg){
+   ctx.save();
+   if(!leftWon){ctx.shadowColor='#f5c842';ctx.shadowBlur=30;} else {ctx.globalAlpha=.55;}
+   ctx.drawImage(bimg,620,220,!leftWon?380:350,!leftWon?532:490);
+   ctx.restore();
+ }
+
+ ctx.fillStyle='#fff';
+ ctx.font='bold 84px sans-serif';
+ ctx.font='900 110px sans-serif'; ctx.fillText('VS',540,500);
+
+ ctx.fillStyle='#f5c842';
+ ctx.font='900 44px Cinzel';
+ ctx.fillText('🏆 ARENA CHAMPION 🏆',540,860);
+
+ ctx.fillStyle='#fff';
+ ctx.font='900 78px Cinzel';
+ ctx.fillText(winnerName.toUpperCase(),540,935);
+
+ ctx.fillStyle='#c0c0c0';
+ ctx.font='30px sans-serif';
+ ctx.fillText('Claimed the Arena Crown',540,980);
+
+ const temp=document.createElement('div');
+ temp.innerHTML=storyText||'';
+ let recap=getArenaCatchphrase(winnerName);
+ if(recap.length>180) recap=recap.substring(0,177)+'...';
+
+ ctx.fillStyle='#f5c842';
+ ctx.font='bold 34px sans-serif';
+ ctx.fillText('BATTLE RECAP',540,1080);
+
+ ctx.fillStyle='#fff';
+ ctx.font='30px sans-serif';
+
+ const words=recap.split(' ');
+ let lines=[''];
+ for(const w of words){
+   const t=(lines[lines.length-1]+' '+w).trim();
+   if(t.length>58) lines.push(w); else lines[lines.length-1]=t;
+ }
+ let y=1145;
+ lines.slice(0,3).forEach(l=>{ctx.fillText(l,540,y); y+=40;});
+
+ return await new Promise(r=>canvas.toBlob(b=>r(new File([b],'arena-share-legendary.png',{type:'image/png'}))));
 }
+
+
+
 function showBattleResult(idA, idB, nameA, nameB) {
   const { paragraphs, winner } = buildBattleStory(nameA, nameB);
 
@@ -1615,7 +1711,7 @@ function showBattleResult(idA, idB, nameA, nameB) {
     wa.innerHTML = `<span class="winner-trophy">🤝</span><span class="winner-name">It's a Draw!</span><span class="winner-label">A historic stalemate</span>`;
   } else {
     const winCard = winner === 'A' ? { name: nameA } : { name: nameB };
-    wa.innerHTML = `<span class="winner-trophy">🏆</span><span class="winner-name">${winCard.name}</span><span class="winner-label">Wins the Battle!</span>`;
+    wa.innerHTML = `<span class="winner-trophy">🏆</span><span class="winner-name">${winCard.name}</span><span class="winner-label">Wins the Battle!</span><div style="margin-top:10px;color:#c9c9c9;font-size:.82rem;font-style:italic">${getArenaCatchphrase(winCard.name)}</div>`;
   }
 
   const resultEl = document.getElementById('battleResult');
@@ -1756,6 +1852,36 @@ showBattleResult=function(idA,idB,nameA,nameB){
 init();
 
 })();
+
+
+const ARENA_RECAP_PHRASES = [
+"Defied the odds and carved their name into Arena history.",
+"Unleashed a legendary performance when it mattered most.",
+"Turned relentless pressure into a decisive victory.",
+"Refused to back down and seized the crown.",
+"Outmatched every challenge on the path to glory.",
+"Delivered a masterclass in Arena domination.",
+"Rose above the chaos and claimed ultimate bragging rights.",
+"Proved that champions are forged in battle.",
+"Overwhelmed the opposition with unstoppable momentum.",
+"Answered every challenge with legendary determination.",
+"Left the crowd speechless with a spectacular finish.",
+"Transformed an even contest into a statement victory.",
+"Demonstrated why legends never stay down for long.",
+"Found another gear and never looked back.",
+"Claimed victory through courage, skill, and determination.",
+"Stood tall when the battle reached its breaking point.",
+"Captured the spotlight with an unforgettable performance.",
+"Turned adversity into triumph before the final clash.",
+"Seized control at the perfect moment and never let go.",
+"Added another chapter to an already legendary story."
+];
+
+function getArenaCatchphrase(cardName){
+ return ARENA_RECAP_PHRASES[Math.floor(Math.random()*ARENA_RECAP_PHRASES.length)];
+}
+
+
 </script>
 </body>
 </html>
