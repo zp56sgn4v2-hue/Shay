@@ -868,6 +868,43 @@ header {
 .power-fill{height:100%;background:#f5c842;width:50%}
 @media(max-width:700px){.arena-dashboard{grid-template-columns:repeat(2,1fr)}}
 
+
+/* V4.5 VISUAL UPGRADE */
+body::before{
+content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+background:
+radial-gradient(circle at 20% 20%,rgba(245,200,66,.08),transparent 35%),
+radial-gradient(circle at 80% 30%,rgba(96,165,250,.06),transparent 30%),
+radial-gradient(circle at 50% 80%,rgba(179,136,255,.05),transparent 35%);
+animation:bgFloat 18s ease-in-out infinite alternate;
+}
+@keyframes bgFloat{from{transform:translateY(0)}to{transform:translateY(-30px)}}
+.card{transform-style:preserve-3d}
+.card::after{
+content:"";position:absolute;inset:0;
+background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.08) 45%,transparent 70%);
+transform:translateX(-120%);transition:1s;
+}
+.card:hover::after{transform:translateX(120%)}
+.drop-img-wrap::before,.fighter-card-preview::before{
+content:"";position:absolute;inset:-2px;
+background:conic-gradient(from 0deg,var(--accent),transparent,var(--accent));
+opacity:.15;animation:spinRing 8s linear infinite;
+}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.arena-title{
+text-shadow:0 0 20px rgba(245,200,66,.4),0 0 50px rgba(245,200,66,.2);
+}
+.vs-circle{
+box-shadow:0 0 20px rgba(245,200,66,.25);
+animation:pulseVS 2s infinite;
+}
+@keyframes pulseVS{50%{transform:scale(1.08)}}
+.winner-announcement{
+background:linear-gradient(180deg,rgba(245,200,66,.08),transparent);
+padding:16px;border-radius:16px;
+}
+
 </style>
 </head>
 <body>
@@ -882,7 +919,13 @@ header {
   <div class="header-actions">
     <button class="icon-btn" id="searchBtn" aria-label="Search">🔍</button>
     <button class="icon-btn" id="collectionBtn" aria-label="Toggle collection">♡</button>
-    <button class="icon-btn arena-icon-btn" id="arenaBtn" aria-label="The Arena" title="The Arena">⚔</button>
+    <div style="position:relative;display:inline-block">
+      <button class="icon-btn arena-icon-btn" id="playMenuBtn" aria-label="Play Menu" title="Play">🎮</button>
+      <div id="playDropdown" style="display:none;position:absolute;right:0;top:50px;background:#111;border:1px solid #333;border-radius:12px;overflow:hidden;min-width:170px;box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:999">
+        <button id="arenaBtn" style="width:100%;padding:12px;border:none;background:#111;color:#f8f8f8;text-align:left;cursor:pointer">⚔ The Arena</button>
+        <button id="adventureBtn" style="width:100%;padding:12px;border:none;background:#111;color:#f8f8f8;text-align:left;cursor:pointer">🗺 Adventure Mode</button>
+      </div>
+    </div>
     <button class="icon-btn" id="shareBtn" aria-label="Share">↗</button>
   </div>
 </header>
@@ -1311,6 +1354,19 @@ document.getElementById('shareBtn').onclick = async () => {
 };
 
 /* ---------- Init with lightbox listeners ---------- */
+
+document.addEventListener('DOMContentLoaded',()=>{
+ const playBtn=document.getElementById('playMenuBtn');
+ const dropdown=document.getElementById('playDropdown');
+ if(playBtn && dropdown){
+   playBtn.addEventListener('click',(e)=>{
+     e.stopPropagation();
+     dropdown.style.display=dropdown.style.display==='block'?'none':'block';
+   });
+   document.addEventListener('click',()=>dropdown.style.display='none');
+ }
+});
+
 window.openLightbox = openLightbox;
 
 function init() {
@@ -1851,6 +1907,17 @@ showBattleResult=function(idA,idB,nameA,nameB){
 
 init();
 
+
+document.querySelectorAll('.card').forEach((card)=>{
+ card.addEventListener('mousemove',(e)=>{
+  const r=card.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width;
+  const y=(e.clientY-r.top)/r.height;
+  card.style.transform=`perspective(800px) rotateY(${(x-.5)*10}deg) rotateX(${(.5-y)*10}deg) translateY(-7px)`;
+ });
+ card.addEventListener('mouseleave',()=>card.style.transform='');
+});
+
 })();
 
 
@@ -1882,6 +1949,454 @@ function getArenaCatchphrase(cardName){
 }
 
 
+
+// removed broken Adventure prototype handler
+</script>
+
+
+<!-- ADVENTURE MODAL STYLES -->
+<style>
+.adv-tabs{display:flex;gap:6px;justify-content:center;margin:18px 0 0}
+.adv-tab{padding:7px 22px;border-radius:999px;font-size:.8rem;font-weight:500;border:1px solid #2a2a2a;background:transparent;color:#888;cursor:pointer;font-family:var(--font);letter-spacing:.02em;transition:all .18s ease}
+.adv-tab:hover{border-color:#444;color:#ccc}
+.adv-tab.active{background:#1a1a1a;border-color:#f5c842;color:#f5c842}
+.adv-tab-badge-count{display:inline-flex;align-items:center;justify-content:center;background:#f5c842;color:#000;font-size:.6rem;font-weight:700;border-radius:999px;min-width:16px;height:16px;padding:0 4px;margin-left:5px;vertical-align:middle;opacity:0;transition:opacity .2s}
+.adv-tab-badge-count.visible{opacity:1}
+.adv-panel{display:none}
+.adv-panel.active{display:block}
+
+/* Badge grid panel */
+.badge-panel-wrap{padding:22px 16px 30px}
+.badge-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.badge-progress-bar{flex:1;height:4px;background:#1e1e1e;border-radius:999px;overflow:hidden}
+.badge-progress-fill{height:100%;background:#f5c842;border-radius:999px;transition:width .5s ease}
+.badge-progress-label{font-size:.72rem;color:#666;white-space:nowrap}
+.badge-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.badge-tile{border-radius:16px;padding:20px 14px 16px;text-align:center;border:1px solid #222;background:#111;transition:border-color .25s,box-shadow .25s,opacity .25s;position:relative;overflow:hidden}
+.badge-tile.unlocked{border-color:#f5c842;box-shadow:0 0 22px rgba(245,200,66,.1)}
+.badge-tile.locked{opacity:.5}
+.badge-tile-img-wrap{width:90px;height:90px;border-radius:50%;overflow:hidden;margin:0 auto 12px;border:2px solid #f5c842;background:#1a1a1a;display:flex;align-items:center;justify-content:center}
+.badge-tile.locked .badge-tile-img-wrap{border-color:#2a2a2a;filter:grayscale(1)}
+.badge-tile-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.badge-tile-emoji{font-size:2.8rem;line-height:1}
+.badge-tile-lock-icon{font-size:2.2rem;opacity:.35}
+.badge-tile-name{font-size:.82rem;font-weight:600;color:#f5c842;margin-bottom:4px;line-height:1.25}
+.badge-tile.locked .badge-tile-name{color:#444}
+.badge-tile-desc{font-size:.68rem;color:#666;margin-bottom:12px;line-height:1.4}
+.badge-tile.locked .badge-tile-desc{color:#333}
+.badge-share-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 16px;border-radius:999px;border:1px solid #f5c842;background:transparent;color:#f5c842;font-family:var(--font);font-size:.7rem;font-weight:500;cursor:pointer;transition:background .18s,color .18s}
+.badge-share-btn:hover{background:#f5c842;color:#000}
+.badge-share-btn svg{flex-shrink:0}
+</style>
+
+<!-- ADVENTURE MODAL -->
+<div id="adventureModal" class="arena-modal">
+  <div class="arena-inner">
+    <div class="arena-header">
+      <button class="arena-close" id="adventureClose">✕</button>
+      <h2 class="arena-title">🗺 Adventure Mode</h2>
+      <p class="arena-subtitle">Choose a Shaylen and begin an adventure</p>
+      <div class="adv-tabs">
+        <button class="adv-tab active" data-panel="adventure">Adventure</button>
+        <button class="adv-tab" data-panel="badges">🏅 Badges<span class="adv-tab-badge-count" id="badgeTabCount"></span></button>
+      </div>
+    </div>
+
+    <!-- ── ADVENTURE PANEL ── -->
+    <div class="adv-panel active" id="panel-adventure">
+      <div style="text-align:center;padding:18px 20px 0">
+        <div id="adventurePicker" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start">
+          <div class="adventure-option active" data-adventure="pickle" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventurePickleImg" data-base="card_7" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #f5c842">
+            <div style="margin-top:6px;font-size:.75rem">🥒 Pickle</div>
+          </div>
+          <div class="adventure-option" data-adventure="baby" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBabyImg" data-base="card_11" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">👶 Baby</div>
+          </div>
+          <div class="adventure-option" data-adventure="beaver" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBeaverImg" data-base="card_2" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">🦫 Beaver</div>
+          </div>
+          <div class="adventure-option" data-adventure="hefty" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureHeftyImg" data-base="card_17" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">💪 Hefty</div>
+          </div>
+          <div class="adventure-option" data-adventure="bros" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBrosImg" data-base="card_23" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">👊 The Bros</div>
+          </div>
+        </div>
+        <input type="hidden" id="adventureSelector" value="pickle">
+      </div>
+      <div style="text-align:center;padding:20px 20px 20px">
+        <img id="adventureHeroImage" data-base="card_7" style="width:220px;max-width:80%;border-radius:16px;border:1px solid #333">
+      </div>
+      <div id="adventureCard" style="max-width:700px;margin:0 auto 24px;border:1px solid #2a2a2a;border-radius:16px;padding:20px;background:#111">
+        <h3 id="storyTitle">Choose Your Adventure</h3>
+        <p id="storyText">Select a Shaylen above to begin their adventure.</p>
+        <div id="storyChoices" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:28px;padding-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- ── BADGES PANEL ── -->
+    <div class="adv-panel" id="panel-badges">
+      <div class="badge-panel-wrap">
+        <div class="badge-progress-row">
+          <div class="badge-progress-bar"><div class="badge-progress-fill" id="badgeProgressFill" style="width:0%"></div></div>
+          <div class="badge-progress-label"><span id="badgeProgress">0</span> / 5 unlocked</div>
+        </div>
+        <div class="badge-panel-grid" id="badgeGrid"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+
+function loadSmart(img, base){
+  if(!img) return;
+  const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+  let i=0;
+  function next(){
+    if(i>=tries.length) return;
+    const test=new Image();
+    test.onload=()=>{ img.src=tries[i]; };
+    test.onerror=()=>{ i++; next(); };
+    test.src=tries[i];
+  }
+  next();
+}
+
+const adventures={
+pickle:{
+0:{t:'Chapter 1: The Pickle Portal',x:'Pickle Shaylen discovers a glowing pickle jar beneath ShayDex Arena.',c:[['Open the Jar',1],['Walk Away',2],['Take It Home',6]]},
+1:{t:'Brine Dimension',x:'A portal opens into a world made entirely of pickles.',c:[['Enter the Portal',7],['Challenge the Dragon',3],['Seal the Portal',8]]},
+2:{t:'Retreat!',x:'The portal follows Pickle Shaylen.',c:[['Hide in the Arena',5],['Turn and Fight',3]]},
+3:{t:'Battle of Brine Peak',x:'The Brine Dragon towers overhead.',c:[['Attack',9],['Negotiate',4]]},
+4:{t:'Friendship Ending',x:'The dragon accepts a peace pickle. The realms unite.',c:[]},
+5:{t:'Chaos Ending',x:'The Arena becomes a giant pickle factory.',c:[]},
+6:{t:'Pickle Research',x:'At home, Shaylen studies the jar.',c:[['Open It Carefully',1],['Sell It to a Collector',10]]},
+7:{t:'The Pickle Kingdom',x:'Citizens beg you to save their king.',c:[['Accept Quest',11],['Refuse',12]]},
+8:{t:'Portal Guardian',x:'You successfully seal the rift.',c:[]},
+9:{t:'Legendary Victory',x:'The dragon is defeated and claims the Crown of Brine.',c:[]},
+10:{t:'Rich Ending',x:'You become wealthy but never learn the jar secrets.',c:[]},
+11:{t:'Royal Rescue',x:'The Pickle King is trapped in a cucumber castle.',c:[['Sneak In',13],['Charge the Gates',14]]},
+12:{t:'Coward Ending',x:'The kingdom falls without its hero.',c:[]},
+13:{t:'Stealth Success',x:'You rescue the king unseen.',c:[]},
+14:{t:'Final Showdown',x:'An evil Vinegar Wizard appears.',c:[['Use the Crown',15],['Fight Normally',16]]},
+15:{t:'True Ending',x:'You save both worlds and become a ShayDex legend.',c:[]},
+16:{t:'Bittersweet Ending',x:'You win but the portal closes forever.',c:[]}
+},
+baby:{
+0:{t:'Chapter 1: Missing Teddy',x:'Baby Shaylen wakes up and discovers Teddy is gone.',c:[['Search the Crib',1],['Call for Help',2],['Follow Tiny Footprints',3]]},
+1:{t:'Under the Blanket',x:'A mysterious tunnel appears beneath the blankets.',c:[['Enter Tunnel',4],['Stay Safe',5]]},
+2:{t:'Family Meeting',x:'Everyone begins searching the house.',c:[['Check Kitchen',6],['Check Playroom',7]]},
+3:{t:'Tiny Expedition',x:'The footprints lead toward the Toy Kingdom.',c:[['Keep Going',8],['Turn Back',5]]},
+4:{t:'Blanket Caverns',x:'You discover toy goblins guarding Teddy.',c:[['Sneak Past',9],['Challenge Them',10]]},
+5:{t:'Nap Ending',x:'Baby Shaylen falls asleep and forgets the adventure.',c:[]},
+6:{t:'Cookie Discovery',x:'Teddy is not here, but cookies are.',c:[['Take Cookies',11],['Continue Search',7]]},
+7:{t:'Playroom Mystery',x:'A toy train offers to help.',c:[['Ride Train',12],['Decline',13]]},
+8:{t:'Toy Kingdom',x:'King Rubber Duck knows where Teddy is.',c:[['Accept Quest',14],['Refuse',13]]},
+9:{t:'Stealth Ending',x:'You rescue Teddy without anyone noticing.',c:[]},
+10:{t:'Rattle Battle',x:'A dramatic toy battle begins.',c:[['Fight On',15],['Make Peace',16]]},
+11:{t:'Sugar Rush',x:'The cookies make you unstoppable.',c:[]},
+12:{t:'Express Rescue',x:'The train speeds you toward Teddy.',c:[['Final Rescue',14]]},
+13:{t:'Lost Opportunity',x:'The trail goes cold.',c:[]},
+14:{t:'Teddy Throne Room',x:'Teddy sits upon a golden toy throne.',c:[['Bring Teddy Home',17],['Crown Teddy King',18]]},
+15:{t:'Victory Ending',x:'The toy goblins are defeated.',c:[]},
+16:{t:'Friendship Ending',x:'Everyone becomes friends.',c:[]},
+17:{t:'True Ending',x:'Teddy returns home and Baby Shaylen becomes a hero.',c:[]},
+18:{t:'Royal Ending',x:'Teddy rules the Toy Kingdom forever.',c:[]}
+}
+,beaver:{
+0:{t:'Chapter 1: The Grand Dam',x:'Beaver Shaylen surveys the river and dreams of building the greatest dam in history.',c:[['Gather Lumber',1],['Scout Upstream',2],['Rally the Animals',3]]},
+1:{t:'Ancient Trees',x:'Deep in the forest, Shaylen finds enormous ancient trees perfect for building.',c:[['Harvest Carefully',4],['Take Everything',5]]},
+2:{t:'Upstream Mystery',x:'A strange glowing current pulses beneath the river surface.',c:[['Dive In',6],['Follow the Bank',7]]},
+3:{t:'Forest Council',x:'The woodland animals agree to help — if Shaylen builds them homes too.',c:[['Accept the Deal',8],['Build Alone',9]]},
+4:{t:'The Perfect Frame',x:'Careful harvesting yields ideal timber. Construction begins beautifully.',c:[['Build a Secret Chamber',10],['Focus on the Dam',11]]},
+5:{t:'Spirit Anger',x:'The forest spirits rise in fury at the wasted ancient trees.',c:[['Apologize',12],['Stand Your Ground',13]]},
+6:{t:'The Deep Current',x:'Beneath the river lies a sunken beaver kingdom, long forgotten.',c:[['Claim the Throne',14],['Restore It',15]]},
+7:{t:'Hidden Falls',x:'Following the bank reveals a massive waterfall — the perfect anchor point.',c:[['Build Here',11]]},
+8:{t:'Great Alliance Ending',x:'Together, Shaylen and the animals complete the dam in one night. A legend is born.',c:[]},
+9:{t:'Lone Builder Ending',x:'The dam stands strong. Simple, honest, and entirely yours.',c:[]},
+10:{t:'Secret Chamber Ending',x:'The hidden room fills with river treasure over time. Beaver Shaylen retires rich.',c:[]},
+11:{t:'True Ending',x:'The dam holds. The river blooms into the most beautiful lake in the land. A masterpiece.',c:[]},
+12:{t:'Spirit Peace Ending',x:'The spirits forgive you and lend their ancient power to the build. Extraordinary.',c:[]},
+13:{t:'Exile Ending',x:'The spirits flood your work site. You rebuild downstream — humbler and wiser.',c:[]},
+14:{t:'River King Ending',x:'Beaver Shaylen rules the sunken kingdom and builds the greatest underwater dam ever known.',c:[]},
+15:{t:'Restoration Ending',x:'You restore the lost kingdom and are named Guardian of the River for all time.',c:[]}
+}
+,hefty:{
+0:{t:'Chapter 1: The Iron Tournament',x:'Hefty Shaylen receives a gilded invitation to the legendary ShayDex Strength Championship.',c:[['Train Immediately',1],['Study the Competition',2],['Enter Without Prep',3]]},
+1:{t:'The Grind',x:'You train day and night. On day three, you stumble onto a secret technique.',c:[['Master It',4],['Skip It',5]]},
+2:{t:'Scouting Report',x:'The reigning champion has never lost — and has a reputation for fighting dirty.',c:[['Find a Weakness',6],['Challenge Them Early',7]]},
+3:{t:'Raw Confidence',x:'Unprepared, you walk into the arena on pure confidence and energy.',c:[['Intimidate the Field',8],['Stay Quiet',9]]},
+4:{t:'The Technique',x:'The secret move channels Hefty energy into a single, unstoppable lift.',c:[['Use It in Round 1',10],['Save It for the Final',11]]},
+5:{t:'Classic Approach',x:'Without the technique you rely on raw strength. It works — until the semifinals.',c:[['Push Through',11]]},
+6:{t:'The Weakness',x:'The champion crumbles under crowd pressure. You have a plan.',c:[['Rally the Crowd',12],['Use It Quietly',13]]},
+7:{t:'Early Clash',x:'The champion accepts your challenge and the crowd erupts.',c:[['Win Dramatically',14],['Lose and Adapt',6]]},
+8:{t:'Fear Factor',x:'The arena falls silent. Half the competition quietly withdraws.',c:[['Accept the Easy Route',15],['Push to the Final',11]]},
+9:{t:'Dark Horse',x:'Nobody watches you train. By the semifinals you are undefeated and unknown.',c:[['Go for Glory',11]]},
+10:{t:'Show of Force Ending',x:'The technique drops every jaw in Round 1. You win before the final even begins.',c:[]},
+11:{t:'True Ending',x:'In the final lift, Hefty Shaylen shatters the all-time record. Undisputed Champion.',c:[]},
+12:{t:'Crowd Victory Ending',x:'The roar of the crowd rattles the champion. Hefty wins cleanly and completely.',c:[]},
+13:{t:'Tactical Ending',x:'You exploit the weakness quietly and precisely. The most dominant win in tournament history.',c:[]},
+14:{t:'Legendary Ending',x:'The dramatic upset becomes the most replayed moment in all of ShayDex.',c:[]},
+15:{t:'Easy Victory Ending',x:'Half the field gone, Hefty coasts to the title on reputation alone. Still counts.',c:[]}
+}
+,bros:{
+0:{t:'Chapter 1: The Squad Mission',x:'Shaylen and the Bros receive a mysterious map leading to the legendary ShayDex Vault.',c:[['Follow the Map',1],['Decode It First',2],['Split Up',3]]},
+1:{t:'Into the Wild',x:'The map leads through a forest none of the Bros have ever seen.',c:[['Stay Together',4],['Let Everyone Lead',5]]},
+2:{t:'The Riddle',x:'Hidden in the map is a message: "The vault opens only for those who bring laughter."',c:[['Prepare Something Funny',6],['Ignore the Riddle',4]]},
+3:{t:'Split Routes',x:'Each Bro takes a different path. Communication breaks down immediately and spectacularly.',c:[['Regroup',4],['Trust the Chaos',7]]},
+4:{t:'Squad Lock',x:'The Bros move as a unit. Every obstacle crumbles in the face of real teamwork.',c:[['Take the Direct Path',8],['Find a Shortcut',9]]},
+5:{t:'Leadership Crisis',x:'Everyone wants to be in charge. The squad nearly implodes three times.',c:[['Shaylen Steps Up',8],['Vote Democratically',10]]},
+6:{t:'The Bit',x:'The Bros rehearse the most chaotic, brilliant comedy routine ever attempted.',c:[['Perform at the Vault',11]]},
+7:{t:'Beautiful Chaos Ending',x:'Somehow, by complete accident, every Bro arrives at the vault at the exact same moment.',c:[]},
+8:{t:'The Guardian',x:'The vault appears through the trees. A stone guardian blocks the entrance.',c:[['Negotiate',12],['Outsmart It',13]]},
+9:{t:'Shortcut Trap',x:'The shortcut drops the Bros into a puzzle room deep underground.',c:[['Solve the Puzzle',14],['Blast Through',15]]},
+10:{t:'The Tie-Breaker',x:'The vote ends in a deadlock. Shaylen breaks the tie and leads the group forward.',c:[['Onward',8]]},
+11:{t:'Laughter Ending',x:'The vault doors burst open laughing. Inside: the greatest ShayDex collection ever assembled.',c:[]},
+12:{t:'Diplomatic Ending',x:'The Bros charm the guardian with a heartfelt speech. The vault opens wide and welcomes them.',c:[]},
+13:{t:'Outsmart Ending',x:'A brilliant trick sends the guardian chasing its own shadow. The Bros slip straight inside.',c:[]},
+14:{t:'True Ending',x:'The Bros solve every puzzle together and emerge as the most legendary squad in ShayDex history.',c:[]},
+15:{t:'Blast Through Ending',x:'Sheer combined energy blows the puzzle room apart. Not elegant — but absolutely effective.',c:[]}
+}
+};
+
+
+const BADGE_KEY='shaydex_adventure_badges';
+let badges=JSON.parse(localStorage.getItem(BADGE_KEY)||'{}');
+const badgeDefs={
+pickle:{name:'The Brine Champion',emoji:'🥒',desc:'Completed Pickle Shaylen Adventure',img:'badge_7'},
+baby:{name:'Tiny Legend',emoji:'👶',desc:'Completed Baby Shaylen Adventure',img:'badge_11'},
+beaver:{name:'The Dam Builder',emoji:'🦫',desc:'Completed Beaver Shaylen Adventure',img:'badge_2'},
+hefty:{name:'Iron Shaylen',emoji:'💪',desc:'Completed Hefty Shaylen Adventure',img:'badge_17'},
+bros:{name:'Crew Captain',emoji:'👊',desc:'Completed The Bros Adventure',img:'badge_23'}
+};
+// Resolve a badge image base to its actual src URL (returns Promise<string>)
+function loadSmartSrc(base){
+  return new Promise((resolve,reject)=>{
+    const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+    let i=0;
+    function next(){
+      if(i>=tries.length){reject(new Error('not found'));return;}
+      const t=new Image();
+      t.onload=()=>resolve(tries[i]);
+      t.onerror=()=>{i++;next();};
+      t.src=tries[i];
+    }
+    next();
+  });
+}
+
+async function shareBadge(id){
+  const def=badgeDefs[id];
+  const txt=def.emoji+' I unlocked the '+def.name+' badge in ShayDex Adventure Mode! 🏅';
+  // Try to share with the badge image
+  if(def.img){
+    try{
+      const src=await loadSmartSrc(def.img);
+      const res=await fetch(src);
+      const blob=await res.blob();
+      const ext=src.split('.').pop().replace(/[^a-z]/gi,'').toLowerCase();
+      const mimeMap={jpeg:'image/jpeg',jpg:'image/jpeg',png:'image/png',webp:'image/webp'};
+      const mime=mimeMap[ext]||blob.type||'image/jpeg';
+      const file=new File([blob],def.img+'.'+ext,{type:mime});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({title:'ShayDex — '+def.name,text:txt,files:[file]});
+        return;
+      }
+    }catch(e){}
+  }
+  // Fallback: text-only share, then clipboard
+  if(navigator.share){
+    try{await navigator.share({title:'ShayDex Badge',text:txt});}catch(e){}
+  } else {
+    navigator.clipboard.writeText(txt).then(()=>alert('Copied to clipboard!')).catch(()=>alert(txt));
+  }
+}
+
+function renderBadges(){
+  const g=document.getElementById('badgeGrid');
+  const p=document.getElementById('badgeProgress');
+  const fill=document.getElementById('badgeProgressFill');
+  const tabCount=document.getElementById('badgeTabCount');
+  if(!g)return;
+  let unlocked=0;
+  g.innerHTML='';
+  const total=Object.keys(badgeDefs).length;
+  Object.keys(badgeDefs).forEach(id=>{
+    const ok=!!badges[id];
+    if(ok) unlocked++;
+    const def=badgeDefs[id];
+    const tile=document.createElement('div');
+    tile.className='badge-tile '+(ok?'unlocked':'locked');
+
+    // Image / emoji / lock
+    const imgWrap=document.createElement('div');
+    imgWrap.className='badge-tile-img-wrap';
+    if(ok&&def.img){
+      const imgEl=document.createElement('img');
+      imgEl.alt=def.name;
+      loadSmart(imgEl,def.img);
+      imgWrap.appendChild(imgEl);
+    } else if(ok){
+      const em=document.createElement('div');
+      em.className='badge-tile-emoji';
+      em.textContent=def.emoji;
+      imgWrap.appendChild(em);
+    } else {
+      const lk=document.createElement('div');
+      lk.className='badge-tile-lock-icon';
+      lk.textContent='🔒';
+      imgWrap.appendChild(lk);
+    }
+    tile.appendChild(imgWrap);
+
+    const nameEl=document.createElement('div');
+    nameEl.className='badge-tile-name';
+    nameEl.textContent=ok?def.name:'Locked';
+    tile.appendChild(nameEl);
+
+    const descEl=document.createElement('div');
+    descEl.className='badge-tile-desc';
+    descEl.textContent=def.desc;
+    tile.appendChild(descEl);
+
+    if(ok){
+      const shareBtn=document.createElement('button');
+      shareBtn.className='badge-share-btn';
+      shareBtn.dataset.share=id;
+      shareBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share';
+      tile.appendChild(shareBtn);
+    }
+    g.appendChild(tile);
+  });
+
+  if(p) p.textContent=unlocked;
+  if(fill) fill.style.width=(total>0?(unlocked/total*100):0)+'%';
+  if(tabCount){
+    tabCount.textContent=unlocked;
+    tabCount.classList.toggle('visible',unlocked>0);
+  }
+  g.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareBadge(b.dataset.share));
+}
+
+// Tab switching
+document.querySelectorAll('.adv-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const target=tab.dataset.panel;
+    document.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.adv-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    const panel=document.getElementById('panel-'+target);
+    if(panel) panel.classList.add('active');
+  });
+});
+function unlockBadge(id){
+ if(badges[id]) return;
+ badges[id]=true;
+ localStorage.setItem(BADGE_KEY,JSON.stringify(badges));
+ renderBadges();
+ setTimeout(()=>{
+   document.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+   document.querySelectorAll('.adv-panel').forEach(p=>p.classList.remove('active'));
+   const bt=document.querySelector('.adv-tab[data-panel="badges"]');
+   const bp=document.getElementById('panel-badges');
+   if(bt) bt.classList.add('active');
+   if(bp) bp.classList.add('active');
+ },300);
+ alert('🏅 Badge Unlocked: '+badgeDefs[id].emoji+' '+badgeDefs[id].name);
+}
+
+let currentAdventure='pickle';
+
+function getNodes(){ return adventures[currentAdventure]; }
+
+function renderNode(id){
+ let n=getNodes()[id];
+ storyTitle.textContent=n.t;
+ storyText.textContent=n.x;
+ storyChoices.innerHTML='';
+ if(!n.c.length){
+ unlockBadge(currentAdventure);
+
+   let b=document.createElement('button');
+   b.className='battle-btn';
+   b.style.minWidth='240px'; b.style.margin='8px';
+   b.textContent='Restart Adventure';
+   b.onclick=()=>updateAdventureSelection(currentAdventure);
+   storyChoices.appendChild(b);
+   return;
+ }
+ n.c.forEach(ch=>{
+   let b=document.createElement('button');
+   b.className='battle-btn';
+   b.style.minWidth='240px'; b.style.margin='8px'; b.style.whiteSpace='normal';
+   b.textContent=ch[0];
+   b.onclick=()=>renderNode(ch[1]);
+   storyChoices.appendChild(b);
+ });
+}
+
+
+function updateAdventureSelection(type){
+ currentAdventure=type;
+ document.getElementById('adventureSelector').value=type;
+
+ document.querySelectorAll('.adventure-option').forEach(el=>{
+   const active=el.dataset.adventure===type;
+   const img=el.querySelector('img');
+   if(img) img.style.border=active?'2px solid #f5c842':'2px solid #333';
+ });
+
+ const heroCardMap={pickle:'card_7',baby:'card_11',beaver:'card_2',hefty:'card_17',bros:'card_23'};
+ const hero=document.getElementById('adventureHeroImage');
+ if(hero){
+   hero.src='';
+   loadSmart(hero,heroCardMap[type]||'card_7');
+ }
+ renderNode(0);
+}
+
+document.querySelectorAll('.adventure-option').forEach(el=>{
+ el.addEventListener('click',()=>updateAdventureSelection(el.dataset.adventure));
+});
+
+document.getElementById('adventureSelector')?.addEventListener('change',e=>{
+ updateAdventureSelection(e.target.value);
+});
+
+
+const storyTitle=document.getElementById('storyTitle');
+const storyText=document.getElementById('storyText');
+const storyChoices=document.getElementById('storyChoices');
+
+loadSmart(document.getElementById('adventurePickleImg'),'card_7');
+loadSmart(document.getElementById('adventureBabyImg'),'card_11');
+loadSmart(document.getElementById('adventureBeaverImg'),'card_2');
+loadSmart(document.getElementById('adventureHeftyImg'),'card_17');
+loadSmart(document.getElementById('adventureBrosImg'),'card_23');
+loadSmart(document.getElementById('adventureHeroImage'),'card_7'); renderBadges();
+
+window.openAdventure=
+()=>{
+ document.getElementById('adventureModal').classList.add('open');
+ document.body.style.overflow='hidden';
+ updateAdventureSelection(currentAdventure);
+};
+
+document.getElementById('adventureClose')?.addEventListener('click',()=>{
+ document.getElementById('adventureModal').classList.remove('open');
+ document.body.style.overflow='';
+});
+
+document.getElementById('adventureBtn')?.addEventListener('click',()=>openAdventure());
+})();
 </script>
 </body>
 </html>
