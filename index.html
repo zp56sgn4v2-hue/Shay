@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ShayDex — College Day Edition</title>
+<meta name="description" content="ShayDex College Day Edition — celebrating Shaylen's first day at Hope College.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="ShayDex — College Day Edition">
+<meta property="og:description" content="Celebrating Shaylen's first day at Hope College.">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ShayDex — The Gallery">
+<meta name="twitter:description" content="The official Shaylen trading card archive. A clean gallery of every Shaylen card.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="theme-color" content="#002244">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&amp;family=Inter:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --accent: #f5c842;
+  --text: #f8f8f8;
+  --text-dim: #888888;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --overlay: rgba(10,10,10,0.92);
+  --r: 14px;
+  --font: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slim Editorial Header */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid #222;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.logo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -.025em;
+  color: var(--accent);
+}
+.card-count {
+  font-size: .82rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: all .15s ease;
+}
+.icon-btn:hover {
+  background: #1a1a1a;
+  color: var(--accent);
+}
+.icon-btn.active {
+  color: var(--accent);
+}
+
+/* New Drops Strip */
+.new-drops {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid #222;
+}
+.new-drops h2 {
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.drops-strip {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.drops-strip::-webkit-scrollbar { display: none; }
+
+.drop-card {
+  flex: 0 0 150px;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+.drop-img-wrap {
+  position: relative;
+  width: 150px;
+  height: 210px;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease;
+}
+.drop-card:hover .drop-img-wrap {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 44px rgba(0,0,0,.65);
+}
+.drop-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.drop-new-badge {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  background: var(--accent);
+  color: #000;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.drop-label {
+  padding: 9px 2px 0;
+}
+.drop-name {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drop-rarity {
+  font-size: .7rem;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* Main Gallery */
+.gallery-header {
+  padding: 28px 24px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.gallery-header h2 {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.gallery-header .count {
+  font-size: .88rem;
+  color: var(--text-dim);
+}
+
+.grid {
+  padding: 0 24px 70px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
+  gap: 14px;
+}
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); } }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(auto-fill, minmax(188px, 1fr)); } }
+@media (min-width: 1200px) { .grid { grid-template-columns: repeat(auto-fill, minmax(198px, 1fr)); } }
+
+.card {
+  position: relative;
+  aspect-ratio: 5 / 7;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: #111;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 6px 22px rgba(0,0,0,.45);
+  transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 22px 50px rgba(0,0,0,.6);
+  }
+  .card:hover img {
+    transform: scale(1.018);
+  }
+  .card .info {
+    transform: translateY(100%);
+  }
+  .card:hover .info {
+    transform: translateY(0);
+  }
+}
+
+/* Always show info on touch devices */
+@media (hover: none) {
+  .card .info {
+    transform: translateY(0);
+    background: linear-gradient(transparent, rgba(10,10,10,0.88) 30%);
+  }
+  .card .fav {
+    opacity: 0.9;
+  }
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .55s ease;
+}
+
+/* Hover info overlay */
+.card .info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 15px 14px;
+  background: linear-gradient(transparent, rgba(10,10,10,0.92) 38%);
+  transition: transform .22s cubic-bezier(.23,1,.32,1);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.card .info strong {
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.card .info .rarity {
+  font-size: .7rem;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: .6px;
+}
+
+/* Favorite heart */
+.card .fav {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0,0,0,.7);
+  color: #fff;
+  font-size: 1.05rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all .2s ease;
+  z-index: 2;
+  cursor: pointer;
+}
+@media (hover: none) {
+  .card .fav { opacity: 0.85; }
+}
+.card:hover .fav,
+.card .fav.favorited {
+  opacity: 1;
+}
+.card .fav.favorited {
+  color: #e03535;
+}
+
+/* Search Overlay */
+#searchOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(22px);
+  z-index: 200;
+  display: none;
+  align-items: flex-start;
+  padding-top: 90px;
+}
+#searchOverlay.open { display: flex; }
+.search-inner {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+#searchInput {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  color: var(--text);
+  font-size: 1.3rem;
+  padding: 18px 24px;
+  border-radius: 999px;
+  outline: none;
+  font-family: inherit;
+}
+#searchInput::placeholder { color: #555; }
+#searchResults {
+  margin-top: 20px;
+  max-height: 58vh;
+  overflow-y: auto;
+}
+
+/* Fullscreen Lightbox */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.96);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+}
+#lightbox.open { display: flex; }
+.lightbox-content {
+  max-width: 880px;
+  width: 100%;
+  text-align: center;
+}
+.lightbox-content img {
+  max-height: 70vh;
+  max-width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 35px 90px rgba(0,0,0,.75);
+  margin-bottom: 22px;
+}
+.lightbox-info {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+.lightbox-info .rarity {
+  color: var(--accent);
+  font-size: .92rem;
+  margin-top: 5px;
+}
+.lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 1.7rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s ease;
+  z-index: 10;
+}
+.lightbox-nav:hover { background: #222; border-color: var(--accent); }
+.lightbox-nav.prev { left: 22px; }
+.lightbox-nav.next { right: 22px; }
+#lightboxClose {
+  position: fixed;
+  top: 26px;
+  right: 26px;
+  width: 46px;
+  height: 46px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 1.5rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+}
+
+/* Rarity filter */
+.rarity-filter {
+  padding: 0 24px 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rarity-pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 500;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: .02em;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.rarity-pill:hover { border-color: #444; color: var(--text); }
+.rarity-pill.active { background: #1e1e1e; border-color: var(--accent); color: var(--accent); }
+
+/* Lightbox action buttons */
+.lightbox-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 18px;
+}
+.lb-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #111;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .18s, color .18s;
+  text-decoration: none;
+}
+.lb-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 70px 20px;
+  color: var(--text-dim);
+  font-size: 1rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 50px 20px 40px;
+  font-size: .78rem;
+  color: #555;
+  letter-spacing: .6px;
+}
+.footer-suggest {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-top: 1px solid #1e1e1e;
+  padding-top: 40px;
+}
+.footer-suggest-text {
+  font-size: .82rem;
+  color: #555;
+  margin-bottom: 14px;
+  letter-spacing: .03em;
+}
+.footer-suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color .18s, color .18s;
+}
+.footer-suggest-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.footer-credit {
+  color: #444;
+  font-size: .75rem;
+  letter-spacing: .08em;
+}
+/* ══════════════════════════════════════════
+   ARENA ICON BUTTON
+══════════════════════════════════════════ */
+.arena-icon-btn {
+  color: var(--accent) !important;
+  font-size: 1rem;
+}
+.arena-icon-btn:hover {
+  background: rgba(245,200,66,.12) !important;
+}
+
+/* ══════════════════════════════════════════
+   ARENA MODAL
+══════════════════════════════════════════ */
+.arena-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+  padding: 20px 16px 40px;
+}
+.arena-modal.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.arena-inner {
+  width: 100%;
+  max-width: 560px;
+  margin: auto;
+}
+
+/* Header */
+.arena-header {
+  position: relative;
+  text-align: center;
+  padding: 36px 20px 28px;
+}
+.arena-close {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  color: #666;
+  font-size: .9rem;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: color .18s, border-color .18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arena-close:hover { color: #f0f0f0; border-color: #555; }
+.arena-eyebrow {
+  font-size: .68rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 8px;
+}
+.arena-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+  letter-spacing: -.01em;
+}
+.arena-subtitle {
+  font-size: .85rem;
+  color: #555;
+  font-weight: 400;
+}
+
+/* Stage */
+.arena-stage {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 0 4px 24px;
+}
+.fighter-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.fighter-label {
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+/* Card preview */
+.fighter-card-preview {
+  width: 130px;
+  aspect-ratio: 2.5/3.5;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 28px rgba(0,0,0,.5);
+  transition: box-shadow .3s, transform .3s;
+  position: relative;
+}
+.fighter-card-preview.loaded {
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+}
+.fighter-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity .35s;
+}
+.fighter-card-preview img.visible { opacity: 1; }
+.fighter-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(
+    45deg,
+    #111 0, #111 10px,
+    #131313 10px, #131313 20px
+  );
+}
+.fighter-q {
+  font-size: 2.4rem;
+  color: #2a2a2a;
+  font-weight: 700;
+}
+
+/* VS divider */
+.vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+}
+.vs-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--accent);
+}
+
+/* Fighter select */
+.fighter-select {
+  width: 100%;
+  max-width: 150px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .78rem;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  transition: border-color .18s;
+}
+.fighter-select:focus { border-color: var(--accent); }
+
+/* Battle button */
+.arena-actions {
+  text-align: center;
+  padding: 4px 0 12px;
+}
+.battle-btn {
+  padding: 13px 36px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #000;
+  font-family: var(--font);
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .04em;
+  transition: background .18s, opacity .18s, transform .15s;
+}
+.battle-btn:hover:not(:disabled) { background: #ffd84d; transform: translateY(-1px); }
+.battle-btn:disabled { opacity: .3; cursor: default; transform: none; }
+.battle-btn.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: #2a2a2a;
+  font-size: .82rem;
+  padding: 10px 22px;
+}
+.battle-btn.secondary:hover { border-color: #555; color: var(--text); }
+
+/* BATTLE ANIMATIONS */
+@keyframes arenaShake {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  10%      { transform: translateX(-8px) rotate(-2deg); }
+  20%      { transform: translateX(8px) rotate(2deg); }
+  30%      { transform: translateX(-6px) rotate(-1deg); }
+  40%      { transform: translateX(6px) rotate(1deg); }
+  50%      { transform: translateX(-4px) rotate(-1deg); }
+  60%      { transform: translateX(4px) rotate(0.5deg); }
+  70%      { transform: translateX(-2px); }
+}
+@keyframes arenaFlash {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .15; }
+}
+@keyframes winnerPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes storyFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes swordSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.4); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.arena-stage.battling .fighter-card-preview {
+  animation: arenaShake 0.6s ease-in-out;
+}
+.arena-stage.battling .vs-circle {
+  animation: swordSpin 0.7s cubic-bezier(.23,1,.32,1);
+  color: #fff;
+  border-color: var(--accent);
+  background: rgba(245,200,66,.15);
+}
+.arena-stage.flash-a #previewA { animation: arenaFlash 0.3s ease-in-out; }
+.arena-stage.flash-b #previewB { animation: arenaFlash 0.3s ease-in-out; }
+
+/* Result panel */
+.battle-result {
+  margin-top: 8px;
+  padding: 24px 4px 0;
+  border-top: 1px solid #1e1e1e;
+  animation: storyFadeIn .4s ease-out;
+}
+.result-vs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.result-fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.result-fighter img {
+  width: 72px;
+  aspect-ratio: 2.5/3.5;
+  object-fit: cover;
+  border-radius: 7px;
+  border: 1px solid #2a2a2a;
+}
+.result-fighter.winner img {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(245,200,66,.3);
+}
+.result-fighter.loser img {
+  opacity: .45;
+  filter: grayscale(60%);
+}
+.result-fighter-name {
+  font-size: .72rem;
+  color: #666;
+  text-align: center;
+  max-width: 90px;
+}
+.result-vs { font-size: 1.1rem; color: #333; }
+
+.battle-story {
+  background: #0f0f0f;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-size: .86rem;
+  line-height: 1.7;
+  color: #aaa;
+  margin-bottom: 20px;
+}
+.battle-story p { margin: 0 0 8px; }
+.battle-story p:last-child { margin-bottom: 0; }
+
+.winner-announcement {
+  text-align: center;
+  margin-bottom: 24px;
+  animation: winnerPop .5s cubic-bezier(.23,1,.32,1);
+}
+.winner-trophy { font-size: 2rem; display: block; margin-bottom: 4px; }
+.winner-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 4px;
+}
+.winner-label {
+  font-size: .75rem;
+  color: #555;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.result-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+/* ===== ARENA V4 PRODUCTION ===== */
+.arena-v4-hub{margin:14px 0 20px;padding:14px;border:1px solid #2a2a2a;border-radius:14px;background:#0f0f0f}
+.arena-dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.arena-stat{padding:10px;border:1px solid #222;border-radius:10px;text-align:center}
+.arena-stat-value{color:#f5c842;font-weight:700;font-size:1rem}
+.power-bar{height:8px;background:#1a1a1a;border-radius:999px;overflow:hidden;margin-top:6px}
+.power-fill{height:100%;background:#f5c842;width:50%}
+@media(max-width:700px){.arena-dashboard{grid-template-columns:repeat(2,1fr)}}
+
+
+/* V4.5 VISUAL UPGRADE */
+body::before{
+content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+background:
+radial-gradient(circle at 20% 20%,rgba(245,200,66,.08),transparent 35%),
+radial-gradient(circle at 80% 30%,rgba(96,165,250,.06),transparent 30%),
+radial-gradient(circle at 50% 80%,rgba(179,136,255,.05),transparent 35%);
+animation:bgFloat 18s ease-in-out infinite alternate;
+}
+@keyframes bgFloat{from{transform:translateY(0)}to{transform:translateY(-30px)}}
+.card{transform-style:preserve-3d}
+.card::after{
+content:"";position:absolute;inset:0;
+background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.08) 45%,transparent 70%);
+transform:translateX(-120%);transition:1s;
+}
+.card:hover::after{transform:translateX(120%)}
+.drop-img-wrap::before,.fighter-card-preview::before{
+content:"";position:absolute;inset:-2px;
+background:conic-gradient(from 0deg,var(--accent),transparent,var(--accent));
+opacity:.15;animation:spinRing 8s linear infinite;
+}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+.arena-title{
+text-shadow:0 0 20px rgba(245,200,66,.4),0 0 50px rgba(245,200,66,.2);
+}
+.vs-circle{
+box-shadow:0 0 20px rgba(245,200,66,.25);
+animation:pulseVS 2s infinite;
+}
+@keyframes pulseVS{50%{transform:scale(1.08)}}
+.winner-announcement{
+background:linear-gradient(180deg,rgba(245,200,66,.08),transparent);
+padding:16px;border-radius:16px;
+}
+
+
+/* ═════════════════════════════════════════════════════════════
+   SHAYDEX COLLEGE DAY EDITION — HOPE COLLEGE THEME
+   Keeps the original gallery/arena experience, refreshes only
+   the visual language for Shaylen's first day at Hope.
+   Hope colors: Orange #F46A1F / Blue #002244.
+═════════════════════════════════════════════════════════════ */
+
+:root{
+  --hope-orange:#F46A1F;
+  --hope-blue:#002244;
+  --hope-blue-2:#07345b;
+  --hope-cream:#f7f2e8;
+  --accent:var(--hope-orange);
+}
+
+body{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(244,106,31,.16), transparent 28%),
+    radial-gradient(circle at 92% 8%, rgba(84,130,171,.14), transparent 30%),
+    linear-gradient(180deg,#001a34 0%,#002244 30%,#07111d 72%,#05080d 100%);
+}
+
+body::after{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(244,106,31,.12),transparent 35%);
+  filter:blur(70px);
+}
+
+header{
+  background:rgba(0,34,68,.96);
+  border-bottom:2px solid var(--hope-orange);
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+
+.logo{
+  color:#fff;
+  letter-spacing:.02em;
+}
+.logo::after{
+  content:"  •  COLLEGE DAY";
+  color:var(--hope-orange);
+  font-size:.62em;
+  letter-spacing:.08em;
+  vertical-align:middle;
+}
+
+.icon-btn:hover{
+  background:rgba(244,106,31,.12);
+  color:var(--hope-orange);
+}
+.icon-btn.active{color:var(--hope-orange)}
+
+.college-day-banner{
+  position:relative;
+  overflow:hidden;
+  margin:0;
+  padding:28px 24px 30px;
+  color:#fff;
+  background:
+    linear-gradient(135deg,rgba(0,34,68,.98),rgba(4,54,91,.96));
+  border-bottom:1px solid rgba(255,255,255,.12);
+  text-align:center;
+}
+.college-day-banner::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.16;
+  background:
+    repeating-linear-gradient(135deg,
+      transparent 0 28px,
+      rgba(255,255,255,.18) 28px 30px,
+      transparent 30px 58px);
+  pointer-events:none;
+}
+.college-day-banner::after{
+  content:"";
+  position:absolute;
+  width:320px;
+  height:320px;
+  left:50%;
+  top:-230px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(244,106,31,.22);
+  filter:blur(45px);
+  pointer-events:none;
+}
+.college-day-inner{
+  position:relative;
+  z-index:1;
+  max-width:900px;
+  margin:auto;
+}
+.college-day-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  margin-bottom:12px;
+  border:1px solid rgba(244,106,31,.65);
+  border-radius:999px;
+  color:#fff;
+  background:rgba(244,106,31,.12);
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.anchor-mark{
+  color:var(--hope-orange);
+  font-size:1.15rem;
+  line-height:1;
+}
+.college-day-title{
+  font-family:var(--font);
+  font-size:clamp(2rem,7vw,4.4rem);
+  line-height:.98;
+  font-weight:700;
+  letter-spacing:-.055em;
+  margin-bottom:10px;
+}
+.college-day-title .orange{color:var(--hope-orange)}
+.college-day-subtitle{
+  color:rgba(255,255,255,.78);
+  font-size:.86rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.college-day-date{
+  margin-top:14px;
+  color:var(--hope-orange);
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.hope-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:18px;
+  padding:8px 14px;
+  background:var(--hope-orange);
+  color:var(--hope-blue);
+  border-radius:999px;
+  font-weight:800;
+  font-size:.72rem;
+  letter-spacing:.08em;
+  box-shadow:0 8px 24px rgba(244,106,31,.24);
+}
+
+.new-drops{
+  background:rgba(0,34,68,.32);
+  border-bottom:1px solid rgba(244,106,31,.18);
+}
+.new-drops h2{color:rgba(255,255,255,.65)}
+.drop-img-wrap{
+  border-color:rgba(244,106,31,.28);
+}
+.drop-new-badge{
+  background:var(--hope-orange);
+  color:var(--hope-blue);
+}
+
+.gallery-header h2{color:var(--hope-cream)}
+.gallery-header .count{color:rgba(255,255,255,.55)}
+.rarity-pill.active{
+  background:rgba(244,106,31,.12);
+  border-color:var(--hope-orange);
+  color:var(--hope-orange);
+}
+.rarity-pill:hover{
+  border-color:rgba(244,106,31,.55);
+}
+
+.card{
+  border-color:rgba(244,106,31,.13);
+  box-shadow:0 8px 26px rgba(0,0,0,.48);
+}
+.card:hover{
+  border-color:rgba(244,106,31,.45);
+  box-shadow:0 24px 55px rgba(0,0,0,.62),0 0 0 1px rgba(244,106,31,.08);
+}
+.card .info .rarity{color:var(--hope-orange)}
+
+.footer{
+  background:linear-gradient(180deg,transparent,rgba(0,34,68,.35));
+}
+.footer-suggest{
+  border-top-color:rgba(244,106,31,.18);
+}
+.footer-suggest-btn:hover{
+  border-color:var(--hope-orange);
+  color:var(--hope-orange);
+}
+
+.lightbox-nav:hover{
+  border-color:var(--hope-orange);
+}
+.lb-action-btn:hover{
+  border-color:var(--hope-orange);
+  color:var(--hope-orange);
+}
+
+@media(max-width:600px){
+  .logo::after{
+    content:"  •  COLLEGE DAY";
+    font-size:.52em;
+  }
+  .college-day-banner{
+    padding:24px 18px 26px;
+  }
+  .college-day-subtitle{
+    font-size:.68rem;
+    line-height:1.5;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Slim Header -->
+<header>
+  <div class="header-left">
+    <div class="logo">SHAYDEX</div>
+    <div class="card-count" id="headerCount">V III&nbsp;&nbsp;•&nbsp;&nbsp;HOPE EDITION</div>
+  </div>
+  
+  <div class="header-actions">
+    <button class="icon-btn" id="searchBtn" aria-label="Search">🔍</button>
+    <button class="icon-btn" id="collectionBtn" aria-label="Toggle collection">♡</button>
+    <div style="position:relative;display:inline-block">
+      <button class="icon-btn arena-icon-btn" id="playMenuBtn" aria-label="Play Menu" title="Play">🎮</button>
+      <div id="playDropdown" style="display:none;position:absolute;right:0;top:50px;background:#111;border:1px solid #333;border-radius:12px;overflow:hidden;min-width:170px;box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:999">
+        <button id="arenaBtn" style="width:100%;padding:12px;border:none;background:#111;color:#f8f8f8;text-align:left;cursor:pointer">⚔ The Arena</button>
+        <button id="adventureBtn" style="width:100%;padding:12px;border:none;background:#111;color:#f8f8f8;text-align:left;cursor:pointer">🗺 Adventure Mode</button>
+      </div>
+    </div>
+    <button class="icon-btn" id="shareBtn" aria-label="Share">↗</button>
+  </div>
+</header>
+
+<!-- ══════════════ COLLEGE DAY EDITION BANNER ══════════════ -->
+<section class="college-day-banner" aria-label="ShayDex College Day Edition">
+  <div class="college-day-inner">
+    <div class="college-day-kicker">
+      <span class="anchor-mark" aria-hidden="true">⚓</span>
+      ShayDex Special Edition
+    </div>
+    <h1 class="college-day-title">
+      COLLEGE DAY <span class="orange">EDITION</span>
+    </h1>
+    <div class="college-day-subtitle">
+      Celebrating Shaylen's first day at <strong>HOPE COLLEGE</strong>
+    </div>
+    <div class="college-day-date">August 27, 2026 &nbsp;•&nbsp; Holland, Michigan</div>
+    <div class="hope-badge"><span aria-hidden="true">⚓</span> GO HOPE &nbsp;•&nbsp; ANCHORED FOR WHAT'S NEXT</div>
+  </div>
+</section>
+
+<!-- New Drops -->
+<section class="new-drops" id="newDropsSection">
+  <h2>New Drops</h2>
+  <div class="drops-strip" id="dropsStrip"></div>
+</section>
+
+<!-- Main Gallery -->
+<section>
+  <div class="gallery-header">
+    <h2 id="galleryTitle">The Collection</h2>
+    <div class="count" id="galleryCount"></div>
+  </div>
+  
+  <div class="rarity-filter" id="rarityFilter">
+    <button class="rarity-pill active" data-rarity="all">All</button>
+    <button class="rarity-pill" data-rarity="Basic">Basic</button>
+    <button class="rarity-pill" data-rarity="Rare">Rare</button>
+    <button class="rarity-pill" data-rarity="Secret Rare">Secret Rare</button>
+    <button class="rarity-pill" data-rarity="Eternal Legend">Eternal Legend</button>
+    <button class="rarity-pill" data-rarity="Dark">Dark</button>
+  </div>
+  <div id="grid" class="grid"></div>
+  
+  <div id="emptyState" class="empty" hidden>
+    No cards in your collection yet.<br>
+    Tap the heart on any card to save it.
+  </div>
+</section>
+
+<div class="footer">
+  <div class="footer-suggest">
+    <div class="footer-suggest-text">Got an idea for a new Shaylen card?</div>
+    <a class="footer-suggest-btn"
+       href="https://docs.google.com/forms/d/e/1FAIpQLSd4IO0m03Xj-opvHVvsBPWpT_TS3-siqkxrSsshLLD0nZJZaQ/viewform?usp=dialog"
+       target="_blank" rel="noopener noreferrer">
+      ✦ Suggest a card
+    </a>
+  </div>
+  <div class="footer-credit">ShayDex V III &nbsp;&middot;&nbsp; Made by Bro Co.</div>
+</div>
+
+<!-- Search Overlay -->
+<div id="searchOverlay">
+  <div class="search-inner">
+    <input type="text" id="searchInput" placeholder="Search cards by name or rarity…" autocomplete="off">
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button id="lightboxClose">✕</button>
+  <button class="lightbox-nav prev" id="lbPrev">‹</button>
+  <div class="lightbox-content">
+    <img id="lbImg" alt="">
+    <div class="lightbox-info">
+      <div id="lbName"></div>
+      <div class="rarity" id="lbRarity"></div>
+    </div>
+    <div class="lightbox-actions">
+      <button class="lb-action-btn" id="lbDownload">↓ Download</button>
+      <button class="lb-action-btn" id="lbShareCard">↗ Share</button>
+    </div>
+  </div>
+  <button class="lightbox-nav next" id="lbNext">›</button>
+</div>
+
+<!-- ══════════════ ARENA MODAL ══════════════ -->
+<div id="arenaModal" class="arena-modal">
+  <div class="arena-inner">
+
+    <!-- Header -->
+    <div class="arena-header">
+      <button class="arena-close" id="arenaClose" aria-label="Close arena">✕</button>
+      <div class="arena-title-block">
+        
+        <h2 class="arena-title">⚔ The Arena</h2>
+        <p class="arena-subtitle">Choose your fighters. Let destiny decide.</p>
+      </div>
+    </div>
+
+    <!-- Fighter selectors -->
+    <div class="arena-stage" id="arenaStage">
+      <div class="fighter-slot" id="slotA">
+        <div class="fighter-label">Fighter 1</div>
+        <div class="fighter-card-preview" id="previewA">
+          <div class="fighter-placeholder">
+            <span class="fighter-q">?</span>
+          </div>
+        </div>
+        <select class="fighter-select" id="selectA" aria-label="Choose Fighter 1">
+          <option value="">Choose a Shaylen…</option>
+        </select>
+      </div>
+
+      <div class="vs-divider" id="vsDivider">
+        <div class="vs-circle">VS</div>
+      </div>
+
+      <div class="fighter-slot" id="slotB">
+        <div class="fighter-label">Fighter 2</div>
+        <div class="fighter-card-preview" id="previewB">
+          <div class="fighter-placeholder">
+            <span class="fighter-q">?</span>
+          </div>
+        </div>
+        <select class="fighter-select" id="selectB" aria-label="Choose Fighter 2">
+          <option value="">Choose a Shaylen…</option>
+        </select>
+      </div>
+    </div>
+
+    
+<div class="arena-v4-hub" style="display:flex;justify-content:center">
+<button class="battle-btn secondary" id="randomBattleBtn" style="padding:8px 16px;font-size:.75rem">🎲 Random Battle</button>
+</div>
+
+<!-- Battle button -->
+    <div class="arena-actions">
+      <button class="battle-btn" id="battleBtn" disabled>⚔ Battle!</button>
+    </div>
+
+    <!-- Result panel (hidden until battle) -->
+    <div class="battle-result" id="battleResult" hidden>
+      <div class="result-vs-bar">
+        <div class="result-fighter" id="resultFighterA"></div>
+        <div class="result-vs">VS</div>
+        <div class="result-fighter" id="resultFighterB"></div>
+      </div>
+      <div class="battle-story" id="battleStory"></div>
+      <div class="winner-announcement" id="winnerAnnouncement"></div>
+      <div class="result-actions">
+        <button class="battle-btn secondary" id="rematchBtn">↩ Rematch</button>
+        <button class="battle-btn secondary" id="shareBattleBtn">↗ Share result</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- ══════════════ END ARENA ══════════════ -->
+
+<script>
+(function(){
+"use strict";
+
+const cards = [
+  ['1','Silly Shaylen','Basic'],
+  ['2','Beaver Shaylen','Rare'],
+  ['3','Sandy Shaylen','Rare'],
+  ['4','Panda Shaylen','Rare'],
+  ['5',"Cheesin' Shaylen",'Rare'],
+  ['6','Princess Shaylen','Secret Rare'],
+  ['7','Pickle Shaylen','Rare'],
+  ['8','Dragon Shaylen','Secret Rare'],
+  ['9','Bald Shaylen','Basic'],
+  ['10','Shuggie','Secret Rare'],
+  ['11','Baby Shaylen','Basic'],
+  ['12','Christmas Shaylen','Eternal Legend'],
+  ['13','Devious Shaylen','Secret Rare'],
+  ['14','Shocker Shaylen','Basic'],
+  ['15','Evil Shaylen','Dark'],
+  ['16','Innocent Shaylen','Basic'],
+  ['17','Hefty Shaylen','Basic'],
+  ['18','Groovin’ Shaylen','Basic'],
+  ['19','Hungry Shaylen','Rare'],
+  ['20','Hangry Shaylen','Basic'],
+  ['21','Sunburnt Shaylen','Basic'],
+  ['22','Nature Shaylen','Rare'],
+  ['23','Shaylen And The Bros','Basic'],
+  ['24','Bizarre Shaylen','Basic'],
+  ['25','Grafiti Shaylen','Basic'],
+  ['26','Thumbs Up Shaylen','Basic'],
+  ['27','Eye Spy Shaylen','Rare'],
+  ['28','Vampire Shaylen','Dark'],
+  ['29','Ghost Shaylen','Basic'],
+  ['30','Crafty Shaylen','Basic']
+].sort((a,b) => Number(b[0]) - Number(a[0]));
+
+const MYSTERY_IDS = new Set(['26','27','28','29','30']);
+const RARITY_COLOR = {Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Dark:'#f87171'};
+
+const FAV_KEY = 'shaydexFavorites_v3';
+const REVEAL_KEY = 'shaydexRevealed_v3';
+let favs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+let revealed = new Set(JSON.parse(localStorage.getItem(REVEAL_KEY) || '[]'));
+
+let showCollection = false;
+let activeRarity = 'all';
+let currentLightboxIndex = -1;
+
+/* ---------- Image loader ---------- */
+const imgCache = {};
+function loadSmart(img, base) {
+  if (imgCache[base]) { img.src = imgCache[base]; return; }
+
+  const tries = [
+    base+'.jpeg', base+'.JPEG',
+    base+'.jpg',  base+'.JPG',
+    base+'.png',  base+'.PNG',
+    base+'.webp', base+'.WEBP'
+  ];
+
+  let i = 0;
+
+  function tryNext() {
+    if (i >= tries.length) return;
+
+    const src = tries[i];
+    const probe = new Image();
+
+    probe.onload = () => {
+      imgCache[base] = src;
+      img.src = src;
+    };
+
+    probe.onerror = () => {
+      i++;
+      tryNext();
+    };
+
+    probe.src = src;
+  }
+
+  tryNext();
+}
+
+/* ---------- Render New Drops ---------- */
+function renderNewDrops() {
+  const container = document.getElementById('dropsStrip');
+  const section = document.getElementById('newDropsSection');
+  const newCards = cards.filter(c => MYSTERY_IDS.has(c[0]));
+
+  if (!newCards.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  container.innerHTML = newCards.map(c => {
+    const id = c[0], name = c[1], rarity = c[2];
+    return `<div class="drop-card" data-id="${id}">
+      <div class="drop-img-wrap">
+        <img data-base="card_${id}" alt="${name}" decoding="async">
+        <span class="drop-new-badge">NEW</span>
+      </div>
+      <div class="drop-label">
+        <div class="drop-name">${name}</div>
+        <div class="drop-rarity" style="color:${RARITY_COLOR[rarity]}">${rarity}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+
+  container.querySelectorAll('.drop-card').forEach(cardEl => {
+    const id = cardEl.dataset.id;
+    cardEl.addEventListener('click', () => {
+      const idx = cards.findIndex(c => c[0] === id);
+      if (idx !== -1) openLightbox(idx);
+    });
+  });
+}
+
+/* ---------- Render Main Gallery ---------- */
+function renderGallery() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('emptyState');
+  const title = document.getElementById('galleryTitle');
+  const countEl = document.getElementById('galleryCount');
+
+  let visibleCards = cards.filter(c => {
+    if (showCollection && !favs.has(c[0])) return false;
+    if (activeRarity !== 'all' && c[2] !== activeRarity) return false;
+    return true;
+  });
+
+  if (visibleCards.length === 0) {
+    grid.innerHTML = '';
+    empty.hidden = false;
+    countEl.textContent = '';
+    return;
+  }
+  empty.hidden = true;
+
+  title.textContent = showCollection ? 'Your Collection' : 'The Collection';
+  countEl.textContent = `${visibleCards.length} cards`;
+
+  grid.innerHTML = visibleCards.map(c => {
+    const id = c[0], name = c[1], rarity = c[2];
+    const isFav = favs.has(id);
+    return `
+      <div class="card" data-id="${id}" data-rarity="${rarity}">
+        <img data-base="card_${id}" alt="${name}" decoding="async">
+        <div class="info">
+          <strong>${name}</strong>
+          <div class="rarity" style="color:${RARITY_COLOR[rarity]||'var(--accent)'}">${rarity}</div>
+        </div>
+        <button class="fav ${isFav ? 'favorited' : ''}" aria-label="Toggle favorite">${isFav ? '❤' : '♡'}</button>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+
+  grid.querySelectorAll('.card').forEach(cardEl => {
+    const id = cardEl.dataset.id;
+    
+    cardEl.addEventListener('click', (e) => {
+      if (e.target.classList.contains('fav')) return;
+      const idx = cards.findIndex(c => c[0] === id);
+      if (idx !== -1) openLightbox(idx);
+    });
+
+    const favBtn = cardEl.querySelector('.fav');
+    favBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (favs.has(id)) {
+        favs.delete(id);
+        favBtn.textContent = '♡';
+        favBtn.classList.remove('favorited');
+      } else {
+        favs.add(id);
+        favBtn.textContent = '❤';
+        favBtn.classList.add('favorited');
+      }
+      localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
+      if (showCollection) renderGallery();
+    });
+  });
+}
+
+/* ---------- Lightbox with fixes ---------- */
+function openLightbox(index) {
+  currentLightboxIndex = index;
+  const c = cards[index];
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lbImg');
+  
+  loadSmart(img, 'card_' + c[0]);
+  document.getElementById('lbName').textContent = c[1];
+  document.getElementById('lbRarity').innerHTML = `<span style="color:${RARITY_COLOR[c[2]]}">${c[2]}</span>`;
+  
+  lb.classList.add('open');
+
+  // Download
+  document.getElementById('lbDownload').onclick = () => {
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = c[1].replace(/[^a-z0-9]/gi, '_') + '_ShayDex.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Share card
+  document.getElementById('lbShareCard').onclick = async () => {
+    const shareData = { title: c[1] + ' — ShayDex', text: c[1] + ' (' + c[2] + ') from the ShayDex archive.', url: location.href };
+    if (navigator.share) { try { await navigator.share(shareData); } catch(e){} }
+    else {
+      try {
+        await navigator.clipboard.writeText(location.href);
+        showToast('Link copied!');
+      } catch(e) {}
+    }
+  };
+}
+
+function navigateLightbox(dir) {
+  const next = ((currentLightboxIndex + dir) + cards.length) % cards.length;
+  currentLightboxIndex = next;
+  openLightbox(currentLightboxIndex);
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+/* ---------- Search ---------- */
+const searchBtn = document.getElementById('searchBtn');
+const searchOverlay = document.getElementById('searchOverlay');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchBtn.onclick = () => {
+  searchOverlay.style.display = 'flex';
+  searchInput.focus();
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+};
+
+searchOverlay.onclick = (e) => { if (e.target === searchOverlay) searchOverlay.style.display = 'none'; };
+
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase().trim();
+  if (!q) { searchResults.innerHTML = ''; return; }
+  
+  const results = cards.filter(c => {
+    if (MYSTERY_IDS.has(c[0]) && !revealed.has(c[0])) return false;
+    return c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q);
+  });
+  
+  searchResults.innerHTML = results.length ? results.map(c => {
+    const idx = cards.findIndex(x => x[0] === c[0]);
+    return `<div style="padding:13px 18px;border-bottom:1px solid #222;cursor:pointer;display:flex;gap:14px;align-items:center" onclick="document.getElementById('searchOverlay').style.display='none'; openLightbox(${idx})">
+      <div style="width:48px;height:67px;background:#222;border-radius:6px;overflow:hidden;flex-shrink:0">
+        <img data-base="card_${c[0]}" style="width:100%;height:100%;object-fit:cover" decoding="async">
+      </div>
+      <div><div style="font-weight:600">${c[1]}</div><div style="color:#f5c842;font-size:.82rem;margin-top:1px">${c[2]}</div></div>
+    </div>`;
+  }).join('') : `<div style="padding:18px;color:#666">No matches.</div>`;
+  
+  searchResults.querySelectorAll('img[data-base]').forEach(img => loadSmart(img, img.dataset.base));
+};
+
+/* ---------- Collection Toggle ---------- */
+// Handled in init()
+
+/* ---------- Share ---------- */
+document.getElementById('shareBtn').onclick = async () => {
+  const data = { title: 'ShayDex — The Gallery', text: 'Clean gallery of every Shaylen card.', url: location.href };
+  if (navigator.share) { try { await navigator.share(data); } catch(e){} }
+  else {
+    try { await navigator.clipboard.writeText(location.href); showToast('Link copied!'); } catch(e){}
+  }
+};
+
+/* ---------- Init with lightbox listeners ---------- */
+
+document.addEventListener('DOMContentLoaded',()=>{
+ const playBtn=document.getElementById('playMenuBtn');
+ const dropdown=document.getElementById('playDropdown');
+ if(playBtn && dropdown){
+   playBtn.addEventListener('click',(e)=>{
+     e.stopPropagation();
+     dropdown.style.display=dropdown.style.display==='block'?'none':'block';
+   });
+   document.addEventListener('click',()=>dropdown.style.display='none');
+ }
+});
+
+window.openLightbox = openLightbox;
+
+function init() {
+  document.getElementById('headerCount').textContent = 'V III';
+  
+  renderNewDrops();
+  renderGallery();
+  
+  // Lightbox event listeners
+  document.getElementById('lightboxClose').onclick = closeLightbox;
+  document.getElementById('lbPrev').onclick = () => navigateLightbox(-1);
+  document.getElementById('lbNext').onclick = () => navigateLightbox(1);
+  
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (lb.classList.contains('open')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    }
+    if (e.key === 'Escape' && searchOverlay.style.display === 'flex') searchOverlay.style.display = 'none';
+    if (e.key === '/' && document.activeElement.tagName === 'BODY') { e.preventDefault(); searchBtn.click(); }
+  });
+  
+  // Close lightbox on background click
+  document.getElementById('lightbox').onclick = (e) => {
+    if (e.target.id === 'lightbox') closeLightbox();
+  };
+
+  // Touch swipe for lightbox
+  let _tsX = null;
+  document.getElementById('lightbox').addEventListener('touchstart', e => {
+    _tsX = e.touches[0].clientX;
+  }, { passive: true });
+  document.getElementById('lightbox').addEventListener('touchend', e => {
+    if (_tsX === null) return;
+    const dx = e.changedTouches[0].clientX - _tsX;
+    if (Math.abs(dx) > 50) navigateLightbox(dx < 0 ? 1 : -1);
+    _tsX = null;
+  }, { passive: true });
+
+  // Collection button: update icon when toggled
+  document.getElementById('collectionBtn').addEventListener('click', () => {
+    showCollection = !showCollection;
+    document.getElementById('collectionBtn').textContent = showCollection ? '❤' : '♡';
+    document.getElementById('collectionBtn').classList.toggle('active', showCollection);
+    renderGallery();
+  });
+
+  // Rarity filter pills
+  document.getElementById('rarityFilter').addEventListener('click', e => {
+    const pill = e.target.closest('.rarity-pill');
+    if (!pill) return;
+    activeRarity = pill.dataset.rarity;
+    document.querySelectorAll('.rarity-pill').forEach(p => p.classList.toggle('active', p === pill));
+    renderGallery();
+  });
+}
+
+/* ---------- Toast ---------- */
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(8px);background:#f0f0f0;color:#0a0a0a;padding:9px 20px;border-radius:999px;font-size:.82rem;font-family:inherit;opacity:0;transition:opacity .2s,transform .2s;z-index:999;pointer-events:none;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(8px)';
+  }, 1800);
+}
+
+
+/* ══════════════════════════════════════════
+   ARENA / BATTLE SYSTEM
+══════════════════════════════════════════ */
+
+
+const CARD_ABILITIES = {
+"Pickle Shaylen":["unleashes a Brine Blast","activates Dill Fury","throws fermented pickle spears","creates a Vinegar Cloud"],
+"Hangry Shaylen":["enters Snackless Rage","uses Hunger Frenzy","unleashes a Craving Strike","activates Mood Swing Combo"],
+"Hungry Shaylen":["finds emergency chicken nuggets","uses Buffet Rush","activates Infinite Appetite","launches Fry Detection"],
+"Groovin’ Shaylen":["drops a Funk Wave","uses Disco Dodge","activates Groove Boost","unleashes a Boogie Counterattack"],
+"Sunburnt Shaylen":["fires a Solar Flare","activates Lobster Mode","uses UV Burst","recovers with Aloe Recovery"],
+"Beaver Shaylen":["uses Dam Slam","launches logs across the arena","attacks with Tail Whip","activates River Control"],
+"Dragon Shaylen":["breathes fire","uses Inferno Dive","activates Ancient Roar","summons Meteor Flame"],
+"Princess Shaylen":["issues a Royal Decree","uses Glitter Barrage","strikes with Crown Strike","activates Kingdom Buff"]
+};
+function getAbility(name){
+ const arr=CARD_ABILITIES[name];
+ return arr?arr[Math.floor(Math.random()*arr.length)]:"uses pure Shaylen energy";
+}
+
+const BATTLE_OPENER = [
+  "The crowd goes absolutely silent.",
+  "The arena lights dim. A hush falls over the audience.",
+  "An announcer’s voice echoes: ‘Ladies and gentlemen…’",
+  "Thunder rumbles outside. The lights flicker.",
+  "Two Shaylens enter the arena. Only one will leave with their dignity intact.",
+];
+
+const BATTLE_MOVES = [
+  ["{A} opens with an unexpected hair flip that distracts {B} completely.",
+   "{B} recovers and fires back with a devastating side-eye.",
+   "{A} responds by pulling out a half-eaten snack from their pocket — iconic."],
+
+  ["{A} immediately trips over nothing, but plays it off flawlessly.",
+   "{B} attempts a power move but accidentally poses for a photo instead.",
+   "{A} seizes the moment and unleashes the world-famous Shaylen Stare™."],
+
+  ["{B} opens with a loud and confident declaration that makes no sense whatsoever.",
+   "{A} blinks slowly. Twice. That was the whole attack.",
+   "{B} is visibly rattled. Their rarity stat drops by vibes."],
+
+  ["{A} screams something indecipherable at maximum volume.",
+   "{B} responds by simply existing — also a strong move.",
+   "Both combatants pause to take a selfie. The crowd approves."],
+
+  ["{A} attempts to reason with {B}. {B} is not taking questions at this time.",
+   "{B} pulls out an ancient scroll. It just says 'NO' in large letters.",
+   "{A} fights back with pure chaotic energy. Very effective."],
+
+  ["{B} delivers a monologue so long that {A} actually falls asleep mid-battle.",
+   "{A} wakes up, immediately wins the next exchange purely on instinct.",
+   "{B} files a formal complaint with the referee. The referee shrugs."],
+
+  ["{A} tries a technique they saw in a dream. Surprisingly, it works.",
+   "{B} counters with a cold stare that has ended lesser battles instantly.",
+   "The arena temperature drops 3 degrees. Even the judges feel it."],
+
+  ["{B} attempts to negotiate a truce. {A} does not accept negotiations.",
+   "{A} makes a face that cannot be described in words.",
+   "{B} considers retiring. Decides against it. Regrets this."],
+];
+
+const BATTLE_FINISH = {
+  A: [
+    "When the dust settles, {A} stands tall — slightly confused, but victorious.",
+    "{A} wins it all with a final move that no one saw coming, including {A}.",
+    "After an exhausting battle, {A} claims victory and immediately asks what's for lunch.",
+    "The judges unanimously declare {A} the winner. {B} disputes this. The judges don't care.",
+  ],
+  B: [
+    "{B} pulls ahead in the final moments with a performance that defies all logic.",
+    "Against all odds, {B} emerges victorious — looking incredible doing it.",
+    "In a stunning reversal, {B} takes the win. The crowd erupts.",
+    "{B} wins on a technicality that won't be explained. Accept it.",
+  ],
+  TIE: [
+    "In an unprecedented twist, the judges declare it a DRAW. Both Shaylens look equally unbothered.",
+    "Neither combatant will yield. After three hours, the battle is officially declared a tie. History is made.",
+  ],
+};
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function fill(str, a, b) { return str.replace(/{A}/g, `<strong>${a}</strong>`).replace(/{B}/g, `<strong>${b}</strong>`); }
+
+function buildBattleStory(nameA, nameB) {
+  const opener = pick(BATTLE_OPENER);
+  const abilityA = `<p><strong>${nameA}</strong> ${getAbility(nameA)}.</p>`;
+  const abilityB = `<p><strong>${nameB}</strong> ${getAbility(nameB)}.</p>`;
+  const moveSet = pick(BATTLE_MOVES);
+  const roll = Math.random();
+  let winner, finisher;
+  if (roll < 0.46) {
+    winner = 'A';
+    finisher = pick(BATTLE_FINISH.A);
+  } else if (roll < 0.92) {
+    winner = 'B';
+    finisher = pick(BATTLE_FINISH.B);
+  } else {
+    winner = 'TIE';
+    finisher = pick(BATTLE_FINISH.TIE);
+  }
+
+  const paragraphs = [opener, abilityA, abilityB, ...moveSet, finisher]
+    .map(line => `<p>${fill(line, nameA, nameB)}</p>`)
+    .join('');
+
+  return { paragraphs, winner };
+}
+
+// Populate selects
+function populateArenaSelects() {
+  const selectA = document.getElementById('selectA');
+  const selectB = document.getElementById('selectB');
+  const opts = cards.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('');
+  selectA.innerHTML = '<option value="">Choose a Shaylen…</option>' + opts;
+  selectB.innerHTML = '<option value="">Choose a Shaylen…</option>' + opts;
+}
+
+// Load card preview
+function loadFighterPreview(previewEl, cardId) {
+  if (!cardId) {
+    previewEl.innerHTML = '<div class="fighter-placeholder"><span class="fighter-q">?</span></div>';
+    return;
+  }
+  previewEl.innerHTML = '<img alt="fighter card" />';
+  const img = previewEl.querySelector('img');
+  const base = 'card_' + cardId;
+  loadSmart(img, base);
+  img.addEventListener('load', () => {
+    img.classList.add('visible');
+    previewEl.classList.add('loaded');
+  }, { once: true });
+  if (img.complete && img.naturalWidth) {
+    img.classList.add('visible');
+    previewEl.classList.add('loaded');
+  }
+}
+
+function updateBattleBtn() {
+  const a = document.getElementById('selectA').value;
+  const b = document.getElementById('selectB').value;
+  const btn = document.getElementById('battleBtn');
+  btn.disabled = !a || !b || a === b;
+  btn.textContent = a && b && a === b ? '⚔ Choose different fighters!' : '⚔ Battle!';
+}
+
+function runBattle() {
+  const idA = document.getElementById('selectA').value;
+  const idB = document.getElementById('selectB').value;
+  if (!idA || !idB || idA === idB) return;
+
+  const cardA = cards.find(c => c[0] === idA);
+  const cardB = cards.find(c => c[0] === idB);
+  const nameA = cardA[1], nameB = cardB[1];
+
+  // Animate the stage
+  const stage = document.getElementById('arenaStage');
+  document.getElementById('battleResult').hidden = true;
+  document.getElementById('battleBtn').disabled = true;
+
+  stage.classList.add('battling');
+  setTimeout(() => stage.classList.add('flash-a'), 300);
+  setTimeout(() => { stage.classList.remove('flash-a'); stage.classList.add('flash-b'); }, 600);
+  setTimeout(() => stage.classList.remove('flash-b'), 900);
+  setTimeout(() => {
+    stage.classList.remove('battling');
+    document.getElementById('battleBtn').disabled = false;
+    showBattleResult(idA, idB, nameA, nameB);
+  }, 1100);
+}
+
+
+
+
+
+async function generateBattleShareImage(idA,idB,nameA,nameB,winner,storyText){
+ const canvas=document.createElement('canvas');
+ canvas.width=1080; canvas.height=1350;
+ const ctx=canvas.getContext('2d');
+
+ 
+const bg=ctx.createRadialGradient(540,500,50,540,700,1000);
+
+ bg.addColorStop(0,'#202020');
+ bg.addColorStop(.5,'#0b0b0b');
+ bg.addColorStop(1,'#000000');
+ ctx.fillStyle=bg;
+ ctx.fillRect(0,0,1080,1350);
+
+const spot=ctx.createRadialGradient(540,420,50,540,420,500);
+spot.addColorStop(0,'rgba(245,200,66,.18)');
+spot.addColorStop(1,'rgba(245,200,66,0)');
+ctx.fillStyle=spot;
+ctx.fillRect(0,0,1080,1350);
+
+for(let i=0;i<80;i++){
+ ctx.fillStyle='rgba(245,200,66,'+(Math.random()*0.12)+')';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*3+1,0,Math.PI*2);
+ ctx.fill();
+}
+
+for(let i=0;i<50;i++){
+ ctx.fillStyle='rgba(255,255,255,0.02)';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*220+60,0,Math.PI*2);
+ ctx.fill();
+}
+
+for(let i=0;i<35;i++){
+ ctx.fillStyle='rgba(255,255,255,0.03)';
+ ctx.beginPath();
+ ctx.arc(Math.random()*1080,Math.random()*1350,Math.random()*180+80,0,Math.PI*2);
+ ctx.fill();
+}
+
+
+ function load(src){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});}
+
+ const aimg=await load(imgCache['card_'+idA]||('card_'+idA+'.jpg'));
+ const bimg=await load(imgCache['card_'+idB]||('card_'+idB+'.jpg'));
+
+ const leftWon = winner==='A';
+ const winnerName = leftWon ? nameA : nameB;
+
+ ctx.textAlign='center';
+ ctx.fillStyle='#f5c842';
+ ctx.font='900 74px Cinzel';
+ ctx.fillText('THE ARENA',540,90);
+
+ ctx.fillStyle='#9f9f9f';
+ ctx.font='italic 28px Bebas Neue';
+ ctx.fillText('CINEMATIC SHOWDOWN',540,130);
+
+ if(aimg){
+   ctx.save();
+   if(leftWon){ctx.shadowColor='#f5c842';ctx.shadowBlur=30;} else {ctx.globalAlpha=.55;}
+   ctx.drawImage(aimg,110,220,leftWon?380:350,leftWon?532:490);
+   ctx.restore();
+ }
+
+ if(bimg){
+   ctx.save();
+   if(!leftWon){ctx.shadowColor='#f5c842';ctx.shadowBlur=30;} else {ctx.globalAlpha=.55;}
+   ctx.drawImage(bimg,620,220,!leftWon?380:350,!leftWon?532:490);
+   ctx.restore();
+ }
+
+ ctx.fillStyle='#fff';
+ ctx.font='bold 84px sans-serif';
+ ctx.font='900 110px sans-serif'; ctx.fillText('VS',540,500);
+
+ ctx.fillStyle='#f5c842';
+ ctx.font='900 44px Cinzel';
+ ctx.fillText('🏆 ARENA CHAMPION 🏆',540,860);
+
+ ctx.fillStyle='#fff';
+ ctx.font='900 78px Cinzel';
+ ctx.fillText(winnerName.toUpperCase(),540,935);
+
+ ctx.fillStyle='#c0c0c0';
+ ctx.font='30px sans-serif';
+ ctx.fillText('Claimed the Arena Crown',540,980);
+
+ const temp=document.createElement('div');
+ temp.innerHTML=storyText||'';
+ let recap=getArenaCatchphrase(winnerName);
+ if(recap.length>180) recap=recap.substring(0,177)+'...';
+
+ ctx.fillStyle='#f5c842';
+ ctx.font='bold 34px sans-serif';
+ ctx.fillText('BATTLE RECAP',540,1080);
+
+ ctx.fillStyle='#fff';
+ ctx.font='30px sans-serif';
+
+ const words=recap.split(' ');
+ let lines=[''];
+ for(const w of words){
+   const t=(lines[lines.length-1]+' '+w).trim();
+   if(t.length>58) lines.push(w); else lines[lines.length-1]=t;
+ }
+ let y=1145;
+ lines.slice(0,3).forEach(l=>{ctx.fillText(l,540,y); y+=40;});
+
+ return await new Promise(r=>canvas.toBlob(b=>r(new File([b],'arena-share-legendary.png',{type:'image/png'}))));
+}
+
+
+
+function showBattleResult(idA, idB, nameA, nameB) {
+  const { paragraphs, winner } = buildBattleStory(nameA, nameB);
+
+  // Populate result fighter thumbnails
+  const rfA = document.getElementById('resultFighterA');
+  const rfB = document.getElementById('resultFighterB');
+
+  rfA.className = 'result-fighter' + (winner === 'A' ? ' winner' : winner === 'B' ? ' loser' : '');
+  rfB.className = 'result-fighter' + (winner === 'B' ? ' winner' : winner === 'A' ? ' loser' : '');
+
+  rfA.innerHTML = `<img alt="${nameA}"><div class="result-fighter-name">${nameA}</div>`;
+  rfB.innerHTML = `<img alt="${nameB}"><div class="result-fighter-name">${nameB}</div>`;
+  loadSmart(rfA.querySelector('img'), 'card_' + idA);
+  loadSmart(rfB.querySelector('img'), 'card_' + idB);
+  [rfA, rfB].forEach(rf => {
+    const img = rf.querySelector('img');
+    if (img.complete && img.naturalWidth) img.style.opacity = '1';
+    else img.addEventListener('load', () => img.style.opacity = '1', { once: true });
+    img.style.opacity = '0';
+    img.style.transition = 'opacity .3s';
+  });
+
+  // Story
+  document.getElementById('battleStory').innerHTML = paragraphs;
+
+  // Winner
+  const wa = document.getElementById('winnerAnnouncement');
+  if (winner === 'TIE') {
+    wa.innerHTML = `<span class="winner-trophy">🤝</span><span class="winner-name">It's a Draw!</span><span class="winner-label">A historic stalemate</span>`;
+  } else {
+    const winCard = winner === 'A' ? { name: nameA } : { name: nameB };
+    wa.innerHTML = `<span class="winner-trophy">🏆</span><span class="winner-name">${winCard.name}</span><span class="winner-label">Wins the Battle!</span><div style="margin-top:10px;color:#c9c9c9;font-size:.82rem;font-style:italic">${getArenaCatchphrase(winCard.name)}</div>`;
+  }
+
+  const resultEl = document.getElementById('battleResult');
+  resultEl.hidden = false;
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Share battle result
+  document.getElementById('shareBattleBtn').onclick = async () => {
+    const file = await generateBattleShareImage(idA,idB,nameA,nameB,winner,paragraphs);
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:'ShayDex Arena Battle'}); }catch(e){}
+      return;
+    }
+    const winText = winner === 'TIE'
+      ? `${nameA} vs ${nameB} — It's a Draw! 🤝`
+      : `${winner === 'A' ? nameA : nameB} defeats ${winner === 'A' ? nameB : nameA}! 🏆`;
+    const text = `ShayDex Arena Battle:\n${winText}\n\nFight your own battles at shaydex.com`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'ShayDex Arena', text, url: location.href }); } catch(e){}
+    } else {
+      try { await navigator.clipboard.writeText(text + '\n' + location.href); showToast('Result copied!'); } catch(e){}
+    }
+  };
+
+  // Rematch
+  document.getElementById('rematchBtn').onclick = () => {
+    document.getElementById('battleResult').hidden = true;
+    updateBattleBtn();
+  };
+}
+
+// Open / close arena
+document.getElementById('arenaBtn').onclick = () => {
+  const modal = document.getElementById('arenaModal');
+  populateArenaSelects();
+  document.getElementById('battleResult').hidden = true;
+  updateBattleBtn();
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+document.getElementById('arenaClose').onclick = () => {
+  document.getElementById('arenaModal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.getElementById('arenaModal').addEventListener('click', e => {
+  if (e.target.id === 'arenaModal') {
+    document.getElementById('arenaModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+// Fighter selects → live preview + battle btn
+document.getElementById('selectA').addEventListener('change', e => {
+  loadFighterPreview(document.getElementById('previewA'), e.target.value);
+  updateBattleBtn();
+});
+document.getElementById('selectB').addEventListener('change', e => {
+  loadFighterPreview(document.getElementById('previewB'), e.target.value);
+  updateBattleBtn();
+});
+
+// Battle!
+document.getElementById('battleBtn').onclick = runBattle;
+
+// Escape key closes arena
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const m = document.getElementById('arenaModal');
+    if (m.classList.contains('open')) { m.classList.remove('open'); document.body.style.overflow = ''; }
+  }
+});
+
+/* ══════════════ END ARENA ══════════════ */
+
+
+const ARENA_V4={battleCount:0,wins:{},champion:'-',streak:0,lastWinner:null};
+
+function getPower(card){
+ const rarity=card[2];
+ let base={Basic:50,Rare:68,'Secret Rare':82,'Eternal Legend':95,Dark:88}[rarity]||60;
+ return base+Math.floor(Math.random()*12);
+}
+
+function updateArenaV4UI(){
+ const champ=Object.entries(ARENA_V4.wins).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById('v4BattleCount').textContent=ARENA_V4.battleCount;
+ document.getElementById('v4Champion').textContent=champ?champ[0]:'-';
+ document.getElementById('v4Streak').textContent=ARENA_V4.streak;
+}
+
+setTimeout(()=>{
+ const rb=document.getElementById('randomBattleBtn');
+ if(rb){
+   rb.onclick=()=>{
+      const ids=cards.map(c=>c[0]);
+      let a=ids[Math.floor(Math.random()*ids.length)];
+      let b=a;
+      while(b===a){b=ids[Math.floor(Math.random()*ids.length)];}
+      selectA.value=a; selectB.value=b;
+      loadFighterPreview(document.getElementById('previewA'),a);
+      loadFighterPreview(document.getElementById('previewB'),b);
+      updateBattleBtn();
+   };
+ }
+ updateArenaV4UI();
+},0);
+
+const __buildBattleStory=buildBattleStory;
+buildBattleStory=function(nameA,nameB){
+ const result=__buildBattleStory(nameA,nameB);
+ const cardA=cards.find(c=>c[1]===nameA);
+ const cardB=cards.find(c=>c[1]===nameB);
+ const pA=getPower(cardA);
+ const pB=getPower(cardB);
+  if(Math.abs(pA-pB)>12){
+   result.winner=pA>pB?'A':'B';
+ }
+ return result;
+};
+
+const __showBattleResult=showBattleResult;
+showBattleResult=function(idA,idB,nameA,nameB){
+ __showBattleResult(idA,idB,nameA,nameB);
+ ARENA_V4.battleCount++;
+ const txt=document.getElementById('winnerAnnouncement').innerText;
+ let winner=null;
+ if(txt.includes(nameA)) winner=nameA;
+ if(txt.includes(nameB)) winner=nameB;
+ if(winner){
+   ARENA_V4.wins[winner]=(ARENA_V4.wins[winner]||0)+1;
+   if(ARENA_V4.lastWinner===winner) ARENA_V4.streak++;
+   else ARENA_V4.streak=1;
+   ARENA_V4.lastWinner=winner;
+ }
+ updateArenaV4UI();
+};
+
+init();
+
+
+document.querySelectorAll('.card').forEach((card)=>{
+ card.addEventListener('mousemove',(e)=>{
+  const r=card.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width;
+  const y=(e.clientY-r.top)/r.height;
+  card.style.transform=`perspective(800px) rotateY(${(x-.5)*10}deg) rotateX(${(.5-y)*10}deg) translateY(-7px)`;
+ });
+ card.addEventListener('mouseleave',()=>card.style.transform='');
+});
+
+})();
+
+
+const ARENA_RECAP_PHRASES = [
+"Defied the odds and carved their name into Arena history.",
+"Unleashed a legendary performance when it mattered most.",
+"Turned relentless pressure into a decisive victory.",
+"Refused to back down and seized the crown.",
+"Outmatched every challenge on the path to glory.",
+"Delivered a masterclass in Arena domination.",
+"Rose above the chaos and claimed ultimate bragging rights.",
+"Proved that champions are forged in battle.",
+"Overwhelmed the opposition with unstoppable momentum.",
+"Answered every challenge with legendary determination.",
+"Left the crowd speechless with a spectacular finish.",
+"Transformed an even contest into a statement victory.",
+"Demonstrated why legends never stay down for long.",
+"Found another gear and never looked back.",
+"Claimed victory through courage, skill, and determination.",
+"Stood tall when the battle reached its breaking point.",
+"Captured the spotlight with an unforgettable performance.",
+"Turned adversity into triumph before the final clash.",
+"Seized control at the perfect moment and never let go.",
+"Added another chapter to an already legendary story."
+];
+
+function getArenaCatchphrase(cardName){
+ return ARENA_RECAP_PHRASES[Math.floor(Math.random()*ARENA_RECAP_PHRASES.length)];
+}
+
+
+
+// removed broken Adventure prototype handler
+</script>
+
+
+<!-- ADVENTURE MODAL STYLES -->
+<style>
+.adv-tabs{display:flex;gap:6px;justify-content:center;margin:18px 0 0}
+.adv-tab{padding:7px 22px;border-radius:999px;font-size:.8rem;font-weight:500;border:1px solid #2a2a2a;background:transparent;color:#888;cursor:pointer;font-family:var(--font);letter-spacing:.02em;transition:all .18s ease}
+.adv-tab:hover{border-color:#444;color:#ccc}
+.adv-tab.active{background:#1a1a1a;border-color:#f5c842;color:#f5c842}
+.adv-tab-badge-count{display:inline-flex;align-items:center;justify-content:center;background:#f5c842;color:#000;font-size:.6rem;font-weight:700;border-radius:999px;min-width:16px;height:16px;padding:0 4px;margin-left:5px;vertical-align:middle;opacity:0;transition:opacity .2s}
+.adv-tab-badge-count.visible{opacity:1}
+.adv-panel{display:none}
+.adv-panel.active{display:block}
+
+/* Badge grid panel */
+.badge-panel-wrap{padding:22px 16px 30px}
+.badge-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.badge-progress-bar{flex:1;height:4px;background:#1e1e1e;border-radius:999px;overflow:hidden}
+.badge-progress-fill{height:100%;background:#f5c842;border-radius:999px;transition:width .5s ease}
+.badge-progress-label{font-size:.72rem;color:#666;white-space:nowrap}
+.badge-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.badge-tile{border-radius:16px;padding:20px 14px 16px;text-align:center;border:1px solid #222;background:#111;transition:border-color .25s,box-shadow .25s,opacity .25s;position:relative;overflow:hidden}
+.badge-tile.unlocked{border-color:#f5c842;box-shadow:0 0 22px rgba(245,200,66,.1)}
+.badge-tile.locked{opacity:.5}
+.badge-tile-img-wrap{width:90px;height:90px;border-radius:50%;overflow:hidden;margin:0 auto 12px;border:2px solid #f5c842;background:#1a1a1a;display:flex;align-items:center;justify-content:center}
+.badge-tile.locked .badge-tile-img-wrap{border-color:#2a2a2a;filter:grayscale(1)}
+.badge-tile-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.badge-tile-emoji{font-size:2.8rem;line-height:1}
+.badge-tile-lock-icon{font-size:2.2rem;opacity:.35}
+.badge-tile-name{font-size:.82rem;font-weight:600;color:#f5c842;margin-bottom:4px;line-height:1.25}
+.badge-tile.locked .badge-tile-name{color:#444}
+.badge-tile-desc{font-size:.68rem;color:#666;margin-bottom:12px;line-height:1.4}
+.badge-tile.locked .badge-tile-desc{color:#333}
+.badge-share-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 16px;border-radius:999px;border:1px solid #f5c842;background:transparent;color:#f5c842;font-family:var(--font);font-size:.7rem;font-weight:500;cursor:pointer;transition:background .18s,color .18s}
+.badge-share-btn:hover{background:#f5c842;color:#000}
+.badge-share-btn svg{flex-shrink:0}
+</style>
+
+<!-- ADVENTURE MODAL -->
+<div id="adventureModal" class="arena-modal">
+  <div class="arena-inner">
+    <div class="arena-header">
+      <button class="arena-close" id="adventureClose">✕</button>
+      <h2 class="arena-title">🗺 Adventure Mode</h2>
+      <p class="arena-subtitle">Choose a Shaylen and begin an adventure</p>
+      <div class="adv-tabs">
+        <button class="adv-tab active" data-panel="adventure">Adventure</button>
+        <button class="adv-tab" data-panel="badges">🏅 Badges<span class="adv-tab-badge-count" id="badgeTabCount"></span></button>
+      </div>
+    </div>
+
+    <!-- ── ADVENTURE PANEL ── -->
+    <div class="adv-panel active" id="panel-adventure">
+      <div style="text-align:center;padding:18px 20px 0">
+        <div id="adventurePicker" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start">
+          <div class="adventure-option active" data-adventure="pickle" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventurePickleImg" data-base="card_7" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #f5c842">
+            <div style="margin-top:6px;font-size:.75rem">🥒 Pickle</div>
+          </div>
+          <div class="adventure-option" data-adventure="baby" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBabyImg" data-base="card_11" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">👶 Baby</div>
+          </div>
+          <div class="adventure-option" data-adventure="beaver" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBeaverImg" data-base="card_2" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">🦫 Beaver</div>
+          </div>
+          <div class="adventure-option" data-adventure="hefty" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureHeftyImg" data-base="card_17" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">💪 Hefty</div>
+          </div>
+          <div class="adventure-option" data-adventure="bros" style="cursor:pointer;flex:0 0 auto;scroll-snap-align:start;text-align:center">
+            <img id="adventureBrosImg" data-base="card_23" style="width:88px;height:123px;object-fit:cover;border-radius:12px;border:2px solid #333">
+            <div style="margin-top:6px;font-size:.75rem">👊 The Bros</div>
+          </div>
+        </div>
+        <input type="hidden" id="adventureSelector" value="pickle">
+      </div>
+      <div style="text-align:center;padding:20px 20px 20px">
+        <img id="adventureHeroImage" data-base="card_7" style="width:220px;max-width:80%;border-radius:16px;border:1px solid #333">
+      </div>
+      <div id="adventureCard" style="max-width:700px;margin:0 auto 24px;border:1px solid #2a2a2a;border-radius:16px;padding:20px;background:#111">
+        <h3 id="storyTitle">Choose Your Adventure</h3>
+        <p id="storyText">Select a Shaylen above to begin their adventure.</p>
+        <div id="storyChoices" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:28px;padding-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- ── BADGES PANEL ── -->
+    <div class="adv-panel" id="panel-badges">
+      <div class="badge-panel-wrap">
+        <div class="badge-progress-row">
+          <div class="badge-progress-bar"><div class="badge-progress-fill" id="badgeProgressFill" style="width:0%"></div></div>
+          <div class="badge-progress-label"><span id="badgeProgress">0</span> / 5 unlocked</div>
+        </div>
+        <div class="badge-panel-grid" id="badgeGrid"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+
+function loadSmart(img, base){
+  if(!img) return;
+  const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+  let i=0;
+  function next(){
+    if(i>=tries.length) return;
+    const test=new Image();
+    test.onload=()=>{ img.src=tries[i]; };
+    test.onerror=()=>{ i++; next(); };
+    test.src=tries[i];
+  }
+  next();
+}
+
+const adventures={
+pickle:{
+0:{t:'Chapter 1: The Pickle Portal',x:'Pickle Shaylen discovers a glowing pickle jar beneath ShayDex Arena.',c:[['Open the Jar',1],['Walk Away',2],['Take It Home',6]]},
+1:{t:'Brine Dimension',x:'A portal opens into a world made entirely of pickles.',c:[['Enter the Portal',7],['Challenge the Dragon',3],['Seal the Portal',8]]},
+2:{t:'Retreat!',x:'The portal follows Pickle Shaylen.',c:[['Hide in the Arena',5],['Turn and Fight',3]]},
+3:{t:'Battle of Brine Peak',x:'The Brine Dragon towers overhead.',c:[['Attack',9],['Negotiate',4]]},
+4:{t:'Friendship Ending',x:'The dragon accepts a peace pickle. The realms unite.',c:[]},
+5:{t:'Chaos Ending',x:'The Arena becomes a giant pickle factory.',c:[]},
+6:{t:'Pickle Research',x:'At home, Shaylen studies the jar.',c:[['Open It Carefully',1],['Sell It to a Collector',10]]},
+7:{t:'The Pickle Kingdom',x:'Citizens beg you to save their king.',c:[['Accept Quest',11],['Refuse',12]]},
+8:{t:'Portal Guardian',x:'You successfully seal the rift.',c:[]},
+9:{t:'Legendary Victory',x:'The dragon is defeated and claims the Crown of Brine.',c:[]},
+10:{t:'Rich Ending',x:'You become wealthy but never learn the jar secrets.',c:[]},
+11:{t:'Royal Rescue',x:'The Pickle King is trapped in a cucumber castle.',c:[['Sneak In',13],['Charge the Gates',14]]},
+12:{t:'Coward Ending',x:'The kingdom falls without its hero.',c:[]},
+13:{t:'Stealth Success',x:'You rescue the king unseen.',c:[]},
+14:{t:'Final Showdown',x:'An evil Vinegar Wizard appears.',c:[['Use the Crown',15],['Fight Normally',16]]},
+15:{t:'True Ending',x:'You save both worlds and become a ShayDex legend.',c:[]},
+16:{t:'Bittersweet Ending',x:'You win but the portal closes forever.',c:[]}
+},
+baby:{
+0:{t:'Chapter 1: Missing Teddy',x:'Baby Shaylen wakes up and discovers Teddy is gone.',c:[['Search the Crib',1],['Call for Help',2],['Follow Tiny Footprints',3]]},
+1:{t:'Under the Blanket',x:'A mysterious tunnel appears beneath the blankets.',c:[['Enter Tunnel',4],['Stay Safe',5]]},
+2:{t:'Family Meeting',x:'Everyone begins searching the house.',c:[['Check Kitchen',6],['Check Playroom',7]]},
+3:{t:'Tiny Expedition',x:'The footprints lead toward the Toy Kingdom.',c:[['Keep Going',8],['Turn Back',5]]},
+4:{t:'Blanket Caverns',x:'You discover toy goblins guarding Teddy.',c:[['Sneak Past',9],['Challenge Them',10]]},
+5:{t:'Nap Ending',x:'Baby Shaylen falls asleep and forgets the adventure.',c:[]},
+6:{t:'Cookie Discovery',x:'Teddy is not here, but cookies are.',c:[['Take Cookies',11],['Continue Search',7]]},
+7:{t:'Playroom Mystery',x:'A toy train offers to help.',c:[['Ride Train',12],['Decline',13]]},
+8:{t:'Toy Kingdom',x:'King Rubber Duck knows where Teddy is.',c:[['Accept Quest',14],['Refuse',13]]},
+9:{t:'Stealth Ending',x:'You rescue Teddy without anyone noticing.',c:[]},
+10:{t:'Rattle Battle',x:'A dramatic toy battle begins.',c:[['Fight On',15],['Make Peace',16]]},
+11:{t:'Sugar Rush',x:'The cookies make you unstoppable.',c:[]},
+12:{t:'Express Rescue',x:'The train speeds you toward Teddy.',c:[['Final Rescue',14]]},
+13:{t:'Lost Opportunity',x:'The trail goes cold.',c:[]},
+14:{t:'Teddy Throne Room',x:'Teddy sits upon a golden toy throne.',c:[['Bring Teddy Home',17],['Crown Teddy King',18]]},
+15:{t:'Victory Ending',x:'The toy goblins are defeated.',c:[]},
+16:{t:'Friendship Ending',x:'Everyone becomes friends.',c:[]},
+17:{t:'True Ending',x:'Teddy returns home and Baby Shaylen becomes a hero.',c:[]},
+18:{t:'Royal Ending',x:'Teddy rules the Toy Kingdom forever.',c:[]}
+}
+,beaver:{
+0:{t:'Chapter 1: The Grand Dam',x:'Beaver Shaylen surveys the river and dreams of building the greatest dam in history.',c:[['Gather Lumber',1],['Scout Upstream',2],['Rally the Animals',3]]},
+1:{t:'Ancient Trees',x:'Deep in the forest, Shaylen finds enormous ancient trees perfect for building.',c:[['Harvest Carefully',4],['Take Everything',5]]},
+2:{t:'Upstream Mystery',x:'A strange glowing current pulses beneath the river surface.',c:[['Dive In',6],['Follow the Bank',7]]},
+3:{t:'Forest Council',x:'The woodland animals agree to help — if Shaylen builds them homes too.',c:[['Accept the Deal',8],['Build Alone',9]]},
+4:{t:'The Perfect Frame',x:'Careful harvesting yields ideal timber. Construction begins beautifully.',c:[['Build a Secret Chamber',10],['Focus on the Dam',11]]},
+5:{t:'Spirit Anger',x:'The forest spirits rise in fury at the wasted ancient trees.',c:[['Apologize',12],['Stand Your Ground',13]]},
+6:{t:'The Deep Current',x:'Beneath the river lies a sunken beaver kingdom, long forgotten.',c:[['Claim the Throne',14],['Restore It',15]]},
+7:{t:'Hidden Falls',x:'Following the bank reveals a massive waterfall — the perfect anchor point.',c:[['Build Here',11]]},
+8:{t:'Great Alliance Ending',x:'Together, Shaylen and the animals complete the dam in one night. A legend is born.',c:[]},
+9:{t:'Lone Builder Ending',x:'The dam stands strong. Simple, honest, and entirely yours.',c:[]},
+10:{t:'Secret Chamber Ending',x:'The hidden room fills with river treasure over time. Beaver Shaylen retires rich.',c:[]},
+11:{t:'True Ending',x:'The dam holds. The river blooms into the most beautiful lake in the land. A masterpiece.',c:[]},
+12:{t:'Spirit Peace Ending',x:'The spirits forgive you and lend their ancient power to the build. Extraordinary.',c:[]},
+13:{t:'Exile Ending',x:'The spirits flood your work site. You rebuild downstream — humbler and wiser.',c:[]},
+14:{t:'River King Ending',x:'Beaver Shaylen rules the sunken kingdom and builds the greatest underwater dam ever known.',c:[]},
+15:{t:'Restoration Ending',x:'You restore the lost kingdom and are named Guardian of the River for all time.',c:[]}
+}
+,hefty:{
+0:{t:'Chapter 1: The Iron Tournament',x:'Hefty Shaylen receives a gilded invitation to the legendary ShayDex Strength Championship.',c:[['Train Immediately',1],['Study the Competition',2],['Enter Without Prep',3]]},
+1:{t:'The Grind',x:'You train day and night. On day three, you stumble onto a secret technique.',c:[['Master It',4],['Skip It',5]]},
+2:{t:'Scouting Report',x:'The reigning champion has never lost — and has a reputation for fighting dirty.',c:[['Find a Weakness',6],['Challenge Them Early',7]]},
+3:{t:'Raw Confidence',x:'Unprepared, you walk into the arena on pure confidence and energy.',c:[['Intimidate the Field',8],['Stay Quiet',9]]},
+4:{t:'The Technique',x:'The secret move channels Hefty energy into a single, unstoppable lift.',c:[['Use It in Round 1',10],['Save It for the Final',11]]},
+5:{t:'Classic Approach',x:'Without the technique you rely on raw strength. It works — until the semifinals.',c:[['Push Through',11]]},
+6:{t:'The Weakness',x:'The champion crumbles under crowd pressure. You have a plan.',c:[['Rally the Crowd',12],['Use It Quietly',13]]},
+7:{t:'Early Clash',x:'The champion accepts your challenge and the crowd erupts.',c:[['Win Dramatically',14],['Lose and Adapt',6]]},
+8:{t:'Fear Factor',x:'The arena falls silent. Half the competition quietly withdraws.',c:[['Accept the Easy Route',15],['Push to the Final',11]]},
+9:{t:'Dark Horse',x:'Nobody watches you train. By the semifinals you are undefeated and unknown.',c:[['Go for Glory',11]]},
+10:{t:'Show of Force Ending',x:'The technique drops every jaw in Round 1. You win before the final even begins.',c:[]},
+11:{t:'True Ending',x:'In the final lift, Hefty Shaylen shatters the all-time record. Undisputed Champion.',c:[]},
+12:{t:'Crowd Victory Ending',x:'The roar of the crowd rattles the champion. Hefty wins cleanly and completely.',c:[]},
+13:{t:'Tactical Ending',x:'You exploit the weakness quietly and precisely. The most dominant win in tournament history.',c:[]},
+14:{t:'Legendary Ending',x:'The dramatic upset becomes the most replayed moment in all of ShayDex.',c:[]},
+15:{t:'Easy Victory Ending',x:'Half the field gone, Hefty coasts to the title on reputation alone. Still counts.',c:[]}
+}
+,bros:{
+0:{t:'Chapter 1: The Squad Mission',x:'Shaylen and the Bros receive a mysterious map leading to the legendary ShayDex Vault.',c:[['Follow the Map',1],['Decode It First',2],['Split Up',3]]},
+1:{t:'Into the Wild',x:'The map leads through a forest none of the Bros have ever seen.',c:[['Stay Together',4],['Let Everyone Lead',5]]},
+2:{t:'The Riddle',x:'Hidden in the map is a message: "The vault opens only for those who bring laughter."',c:[['Prepare Something Funny',6],['Ignore the Riddle',4]]},
+3:{t:'Split Routes',x:'Each Bro takes a different path. Communication breaks down immediately and spectacularly.',c:[['Regroup',4],['Trust the Chaos',7]]},
+4:{t:'Squad Lock',x:'The Bros move as a unit. Every obstacle crumbles in the face of real teamwork.',c:[['Take the Direct Path',8],['Find a Shortcut',9]]},
+5:{t:'Leadership Crisis',x:'Everyone wants to be in charge. The squad nearly implodes three times.',c:[['Shaylen Steps Up',8],['Vote Democratically',10]]},
+6:{t:'The Bit',x:'The Bros rehearse the most chaotic, brilliant comedy routine ever attempted.',c:[['Perform at the Vault',11]]},
+7:{t:'Beautiful Chaos Ending',x:'Somehow, by complete accident, every Bro arrives at the vault at the exact same moment.',c:[]},
+8:{t:'The Guardian',x:'The vault appears through the trees. A stone guardian blocks the entrance.',c:[['Negotiate',12],['Outsmart It',13]]},
+9:{t:'Shortcut Trap',x:'The shortcut drops the Bros into a puzzle room deep underground.',c:[['Solve the Puzzle',14],['Blast Through',15]]},
+10:{t:'The Tie-Breaker',x:'The vote ends in a deadlock. Shaylen breaks the tie and leads the group forward.',c:[['Onward',8]]},
+11:{t:'Laughter Ending',x:'The vault doors burst open laughing. Inside: the greatest ShayDex collection ever assembled.',c:[]},
+12:{t:'Diplomatic Ending',x:'The Bros charm the guardian with a heartfelt speech. The vault opens wide and welcomes them.',c:[]},
+13:{t:'Outsmart Ending',x:'A brilliant trick sends the guardian chasing its own shadow. The Bros slip straight inside.',c:[]},
+14:{t:'True Ending',x:'The Bros solve every puzzle together and emerge as the most legendary squad in ShayDex history.',c:[]},
+15:{t:'Blast Through Ending',x:'Sheer combined energy blows the puzzle room apart. Not elegant — but absolutely effective.',c:[]}
+}
+};
+
+
+const BADGE_KEY='shaydex_adventure_badges';
+let badges=JSON.parse(localStorage.getItem(BADGE_KEY)||'{}');
+const badgeDefs={
+pickle:{name:'The Brine Champion',emoji:'🥒',desc:'Completed Pickle Shaylen Adventure',img:'badge_7'},
+baby:{name:'Tiny Legend',emoji:'👶',desc:'Completed Baby Shaylen Adventure',img:'badge_11'},
+beaver:{name:'The Dam Builder',emoji:'🦫',desc:'Completed Beaver Shaylen Adventure',img:'badge_2'},
+hefty:{name:'Iron Shaylen',emoji:'💪',desc:'Completed Hefty Shaylen Adventure',img:'badge_17'},
+bros:{name:'Crew Captain',emoji:'👊',desc:'Completed The Bros Adventure',img:'badge_23'}
+};
+// Resolve a badge image base to its actual src URL (returns Promise<string>)
+function loadSmartSrc(base){
+  return new Promise((resolve,reject)=>{
+    const tries=[base+'.jpeg',base+'.JPEG',base+'.jpg',base+'.JPG',base+'.png',base+'.PNG',base+'.webp',base+'.WEBP'];
+    let i=0;
+    function next(){
+      if(i>=tries.length){reject(new Error('not found'));return;}
+      const t=new Image();
+      t.onload=()=>resolve(tries[i]);
+      t.onerror=()=>{i++;next();};
+      t.src=tries[i];
+    }
+    next();
+  });
+}
+
+async function shareBadge(id){
+  const def=badgeDefs[id];
+  const txt=def.emoji+' I unlocked the '+def.name+' badge in ShayDex Adventure Mode! 🏅';
+  // Try to share with the badge image
+  if(def.img){
+    try{
+      const src=await loadSmartSrc(def.img);
+      const res=await fetch(src);
+      const blob=await res.blob();
+      const ext=src.split('.').pop().replace(/[^a-z]/gi,'').toLowerCase();
+      const mimeMap={jpeg:'image/jpeg',jpg:'image/jpeg',png:'image/png',webp:'image/webp'};
+      const mime=mimeMap[ext]||blob.type||'image/jpeg';
+      const file=new File([blob],def.img+'.'+ext,{type:mime});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({title:'ShayDex — '+def.name,text:txt,files:[file]});
+        return;
+      }
+    }catch(e){}
+  }
+  // Fallback: text-only share, then clipboard
+  if(navigator.share){
+    try{await navigator.share({title:'ShayDex Badge',text:txt});}catch(e){}
+  } else {
+    navigator.clipboard.writeText(txt).then(()=>alert('Copied to clipboard!')).catch(()=>alert(txt));
+  }
+}
+
+function renderBadges(){
+  const g=document.getElementById('badgeGrid');
+  const p=document.getElementById('badgeProgress');
+  const fill=document.getElementById('badgeProgressFill');
+  const tabCount=document.getElementById('badgeTabCount');
+  if(!g)return;
+  let unlocked=0;
+  g.innerHTML='';
+  const total=Object.keys(badgeDefs).length;
+  Object.keys(badgeDefs).forEach(id=>{
+    const ok=!!badges[id];
+    if(ok) unlocked++;
+    const def=badgeDefs[id];
+    const tile=document.createElement('div');
+    tile.className='badge-tile '+(ok?'unlocked':'locked');
+
+    // Image / emoji / lock
+    const imgWrap=document.createElement('div');
+    imgWrap.className='badge-tile-img-wrap';
+    if(ok&&def.img){
+      const imgEl=document.createElement('img');
+      imgEl.alt=def.name;
+      loadSmart(imgEl,def.img);
+      imgWrap.appendChild(imgEl);
+    } else if(ok){
+      const em=document.createElement('div');
+      em.className='badge-tile-emoji';
+      em.textContent=def.emoji;
+      imgWrap.appendChild(em);
+    } else {
+      const lk=document.createElement('div');
+      lk.className='badge-tile-lock-icon';
+      lk.textContent='🔒';
+      imgWrap.appendChild(lk);
+    }
+    tile.appendChild(imgWrap);
+
+    const nameEl=document.createElement('div');
+    nameEl.className='badge-tile-name';
+    nameEl.textContent=ok?def.name:'Locked';
+    tile.appendChild(nameEl);
+
+    const descEl=document.createElement('div');
+    descEl.className='badge-tile-desc';
+    descEl.textContent=def.desc;
+    tile.appendChild(descEl);
+
+    if(ok){
+      const shareBtn=document.createElement('button');
+      shareBtn.className='badge-share-btn';
+      shareBtn.dataset.share=id;
+      shareBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share';
+      tile.appendChild(shareBtn);
+    }
+    g.appendChild(tile);
+  });
+
+  if(p) p.textContent=unlocked;
+  if(fill) fill.style.width=(total>0?(unlocked/total*100):0)+'%';
+  if(tabCount){
+    tabCount.textContent=unlocked;
+    tabCount.classList.toggle('visible',unlocked>0);
+  }
+  g.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareBadge(b.dataset.share));
+}
+
+// Tab switching
+document.querySelectorAll('.adv-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const target=tab.dataset.panel;
+    document.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.adv-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    const panel=document.getElementById('panel-'+target);
+    if(panel) panel.classList.add('active');
+  });
+});
+function unlockBadge(id){
+ if(badges[id]) return;
+ badges[id]=true;
+ localStorage.setItem(BADGE_KEY,JSON.stringify(badges));
+ renderBadges();
+ setTimeout(()=>{
+   document.querySelectorAll('.adv-tab').forEach(t=>t.classList.remove('active'));
+   document.querySelectorAll('.adv-panel').forEach(p=>p.classList.remove('active'));
+   const bt=document.querySelector('.adv-tab[data-panel="badges"]');
+   const bp=document.getElementById('panel-badges');
+   if(bt) bt.classList.add('active');
+   if(bp) bp.classList.add('active');
+ },300);
+ alert('🏅 Badge Unlocked: '+badgeDefs[id].emoji+' '+badgeDefs[id].name);
+}
+
+let currentAdventure='pickle';
+
+function getNodes(){ return adventures[currentAdventure]; }
+
+function renderNode(id){
+ let n=getNodes()[id];
+ storyTitle.textContent=n.t;
+ storyText.textContent=n.x;
+ storyChoices.innerHTML='';
+ if(!n.c.length){
+ unlockBadge(currentAdventure);
+
+   let b=document.createElement('button');
+   b.className='battle-btn';
+   b.style.minWidth='240px'; b.style.margin='8px';
+   b.textContent='Restart Adventure';
+   b.onclick=()=>updateAdventureSelection(currentAdventure);
+   storyChoices.appendChild(b);
+   return;
+ }
+ n.c.forEach(ch=>{
+   let b=document.createElement('button');
+   b.className='battle-btn';
+   b.style.minWidth='240px'; b.style.margin='8px'; b.style.whiteSpace='normal';
+   b.textContent=ch[0];
+   b.onclick=()=>renderNode(ch[1]);
+   storyChoices.appendChild(b);
+ });
+}
+
+
+function updateAdventureSelection(type){
+ currentAdventure=type;
+ document.getElementById('adventureSelector').value=type;
+
+ document.querySelectorAll('.adventure-option').forEach(el=>{
+   const active=el.dataset.adventure===type;
+   const img=el.querySelector('img');
+   if(img) img.style.border=active?'2px solid #f5c842':'2px solid #333';
+ });
+
+ const heroCardMap={pickle:'card_7',baby:'card_11',beaver:'card_2',hefty:'card_17',bros:'card_23'};
+ const hero=document.getElementById('adventureHeroImage');
+ if(hero){
+   hero.src='';
+   loadSmart(hero,heroCardMap[type]||'card_7');
+ }
+ renderNode(0);
+}
+
+document.querySelectorAll('.adventure-option').forEach(el=>{
+ el.addEventListener('click',()=>updateAdventureSelection(el.dataset.adventure));
+});
+
+document.getElementById('adventureSelector')?.addEventListener('change',e=>{
+ updateAdventureSelection(e.target.value);
+});
+
+
+const storyTitle=document.getElementById('storyTitle');
+const storyText=document.getElementById('storyText');
+const storyChoices=document.getElementById('storyChoices');
+
+loadSmart(document.getElementById('adventurePickleImg'),'card_7');
+loadSmart(document.getElementById('adventureBabyImg'),'card_11');
+loadSmart(document.getElementById('adventureBeaverImg'),'card_2');
+loadSmart(document.getElementById('adventureHeftyImg'),'card_17');
+loadSmart(document.getElementById('adventureBrosImg'),'card_23');
+loadSmart(document.getElementById('adventureHeroImage'),'card_7'); renderBadges();
+
+window.openAdventure=
+()=>{
+ document.getElementById('adventureModal').classList.add('open');
+ document.body.style.overflow='hidden';
+ updateAdventureSelection(currentAdventure);
+};
+
+document.getElementById('adventureClose')?.addEventListener('click',()=>{
+ document.getElementById('adventureModal').classList.remove('open');
+ document.body.style.overflow='';
+});
+
+document.getElementById('adventureBtn')?.addEventListener('click',()=>openAdventure());
+})();
+</script>
+</body>
+</html>
