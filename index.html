@@ -9,11 +9,11 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="ShayDex — College Day Edition">
 <meta property="og:description" content="Celebrating Shaylen's first day at Hope College.">
-<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-college-day-share.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ShayDex — The Gallery">
-<meta name="twitter:description" content="The official Shaylen trading card archive. A clean gallery of every Shaylen card.">
-<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-og.png">
+<meta name="twitter:title" content="ShayDex — College Day Edition">
+<meta name="twitter:description" content="Celebrating Shaylen's first day at Hope College — ShayDex College Day Edition.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN.com/shaydex-college-day-share.png">
 <meta name="theme-color" content="#002244">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1191,6 +1191,7 @@ header{
     <button class="rarity-pill" data-rarity="Rare">Rare</button>
     <button class="rarity-pill" data-rarity="Secret Rare">Secret Rare</button>
     <button class="rarity-pill" data-rarity="Eternal Legend">Eternal Legend</button>
+    <button class="rarity-pill" data-rarity="Legendary">Legendary</button>
     <button class="rarity-pill" data-rarity="Dark">Dark</button>
   </div>
   <div id="grid" class="grid"></div>
@@ -1347,11 +1348,12 @@ const cards = [
   ['27','Eye Spy Shaylen','Rare'],
   ['28','Vampire Shaylen','Dark'],
   ['29','Ghost Shaylen','Basic'],
-  ['30','Crafty Shaylen','Basic']
+  ['30','Crafty Shaylen','Basic'],
+  ['31','Anchor Shaylen','Legendary']
 ].sort((a,b) => Number(b[0]) - Number(a[0]));
 
-const MYSTERY_IDS = new Set(['26','27','28','29','30']);
-const RARITY_COLOR = {Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Dark:'#f87171'};
+const MYSTERY_IDS = new Set(['31']);
+const RARITY_COLOR = {Basic:'#9aa3bb',Rare:'#60a5fa','Secret Rare':'#b388ff','Eternal Legend':'#facc15',Legendary:'#f5c842',Dark:'#f87171'};
 
 const FAV_KEY = 'shaydexFavorites_v3';
 const REVEAL_KEY = 'shaydexRevealed_v3';
@@ -1587,11 +1589,90 @@ searchInput.oninput = () => {
 // Handled in init()
 
 /* ---------- Share ---------- */
+async function generateCollegeDayShareImage(){
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200; canvas.height = 630;
+  const ctx = canvas.getContext('2d');
+
+  // Hope-inspired College Day share card.
+  const bg = ctx.createLinearGradient(0,0,0,630);
+  bg.addColorStop(0,'#002244');
+  bg.addColorStop(1,'#07111d');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,1200,630);
+
+  // Subtle diagonal celebration pattern.
+  ctx.save();
+  ctx.globalAlpha = .07;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  for(let x=-700;x<1500;x+=46){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x+630,630); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Warm orange glow.
+  const glow = ctx.createRadialGradient(600,-120,20,600,-120,430);
+  glow.addColorStop(0,'rgba(244,106,31,.42)');
+  glow.addColorStop(1,'rgba(244,106,31,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0,0,1200,630);
+
+  // Generic decorative anchor.
+  ctx.strokeStyle = '#F46A1F';
+  ctx.lineWidth = 9;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(600,72,16,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(600,88); ctx.lineTo(600,160); ctx.stroke();
+  ctx.beginPath(); ctx.arc(600,128,65,0,Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(535,160); ctx.lineTo(516,139); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(665,160); ctx.lineTo(684,139); ctx.stroke();
+
+  ctx.textAlign='center';
+  ctx.fillStyle='#fff';
+  ctx.font='900 76px sans-serif';
+  ctx.fillText('SHAYDEX',600,250);
+
+  ctx.fillStyle='#F46A1F';
+  ctx.font='900 60px sans-serif';
+  ctx.fillText('COLLEGE DAY EDITION',600,330);
+
+  ctx.fillStyle='#fff';
+  ctx.font='500 28px sans-serif';
+  ctx.fillText("Celebrating Shaylen's First Day at Hope College",600,390);
+
+  ctx.fillStyle='#D6E0E8';
+  ctx.font='600 22px sans-serif';
+  ctx.fillText('A SPECIAL SHAYDEX EDITION  •  AUGUST 27, 2026',600,432);
+
+  ctx.fillStyle='#F46A1F';
+  ctx.beginPath(); ctx.roundRect(375,480,450,58,29); ctx.fill();
+  ctx.fillStyle='#002244';
+  ctx.font='800 21px sans-serif';
+  ctx.fillText("GO HOPE  •  ANCHORED FOR WHAT'S NEXT",600,517);
+
+  return await new Promise(resolve =>
+    canvas.toBlob(blob => resolve(new File([blob],'shaydex-college-day-share.png',{type:'image/png'})))
+  );
+}
+
 document.getElementById('shareBtn').onclick = async () => {
-  const data = { title: 'ShayDex — The Gallery', text: 'Clean gallery of every Shaylen card.', url: location.href };
-  if (navigator.share) { try { await navigator.share(data); } catch(e){} }
-  else {
-    try { await navigator.clipboard.writeText(location.href); showToast('Link copied!'); } catch(e){}
+  const title = 'ShayDex — College Day Edition';
+  const text = "🎓⚓ ShayDex College Day Edition — celebrating Shaylen's first day at Hope College!";
+  if (navigator.share) {
+    try {
+      const file = await generateCollegeDayShareImage();
+      if (navigator.canShare && navigator.canShare({files:[file]})) {
+        await navigator.share({title, text, url: location.href, files:[file]});
+      } else {
+        await navigator.share({title, text, url: location.href});
+      }
+    } catch(e){}
+  } else {
+    try {
+      await navigator.clipboard.writeText(text + '\n' + location.href);
+      showToast('College Day link copied!');
+    } catch(e){}
   }
 };
 
